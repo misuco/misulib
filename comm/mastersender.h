@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QList>
 #include "lib/misulib/comm/libofqf/qoscclient.h"
-#include "sendermobilesynth.h"
+#include "isender.h"
 
 class MasterSender : public QObject
 {
