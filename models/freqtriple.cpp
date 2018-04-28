@@ -94,7 +94,7 @@ int FreqTriple::getRootNote() const
 
 QString FreqTriple::getRootNoteString(int lang) const
 {
-    if(lang==1) {
+    if(lang==2) {
         switch(_rootNote) {
                 case 0: return "सा";
                 break;
@@ -121,7 +121,7 @@ QString FreqTriple::getRootNoteString(int lang) const
                 case 11: return "नि";
                 break;
         }
-    } else if(lang==2) {
+    } else if(lang==3) {
         switch(_rootNote) {
                 case 0: return "DO";
                 break;
@@ -148,7 +148,7 @@ QString FreqTriple::getRootNoteString(int lang) const
                 case 11: return "TI";
                 break;
         }
-    } else if(lang==3) {
+    } else if(lang==4) {
         switch(_rootNote) {
                 case 0: return "SA";
                 break;
@@ -175,7 +175,7 @@ QString FreqTriple::getRootNoteString(int lang) const
                 case 11: return "NI";
                 break;
         }
-    } else if(lang==0) {
+    } else if(lang==1) {
         switch(_rootNote) {
         case 0: return "C";
         break;

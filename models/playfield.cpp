@@ -6,7 +6,9 @@ Playfield::Playfield(QObject *parent) : QObject(parent),
     f1(0,this),
     f2(0,this),
     hue1bent(0),
-    hue2bent(0)
+    hue2bent(0),
+    _noteSymbols(0),
+    _showFreqs(0)
 {}
 
 void Playfield::setF1rootNote(int r)
@@ -191,7 +193,7 @@ void Playfield::calcText()
 {
     text1="";
     text2=f1.getRootNoteString(_noteSymbols);
-    if(type==0) text3.sprintf("%d",f1.getOct());
+    if(type==0 && _noteSymbols>0) text3.sprintf("%d",f1.getOct());
     else text3="";
     if(_showFreqs) {
         text1.sprintf("%4.1f",f1.getFreq());
