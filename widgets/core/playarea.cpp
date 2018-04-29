@@ -24,6 +24,7 @@
 #include <QTouchEvent>
 #include <QDateTime>
 #include "lib/misulib/comm/mastersender.h"
+#include <math.h>
 
 PlayArea::PlayArea(MasterSender * ms, QObject *parent) : QObject(parent),
     out(ms),
