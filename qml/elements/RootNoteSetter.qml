@@ -1,8 +1,12 @@
 import QtQuick 2.0
 
 Item {
+    id: root
+    property var model
+    property var pitchColors
+
     GridView {
-        model: layout.rootNoteSetter
+        model: root.model
 
         anchors.fill: parent
         cellWidth: buttonSize
@@ -11,8 +15,8 @@ Item {
         flow: GridView.FlowTopToBottom
 
         delegate: Rectangle {
-            color: modelData.selected ? layout.pitchColors[modelData.rootNote].colorOn
-                                      : layout.pitchColors[modelData.rootNote].colorOff
+            color: modelData.selected ? root.pitchColors[modelData.rootNote].colorOn
+                                      : root.pitchColors[modelData.rootNote].colorOff
             width: buttonSize
             height: buttonSize
             radius: buttonRadius

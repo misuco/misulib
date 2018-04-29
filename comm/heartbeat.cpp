@@ -59,6 +59,12 @@ void Heartbeat::onSetScale(int n, bool v)
     propagateScale();
 }
 
+void Heartbeat::onSetScale(QList<bool> scale)
+{
+    _scale=scale;
+    propagateScale();
+}
+
 void Heartbeat::onSetScale(int rootNote, QList<bool> scale)
 {
     _scale=scale;

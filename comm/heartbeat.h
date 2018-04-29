@@ -18,6 +18,7 @@ signals:
 
 public slots:    
     void onSetRootNote(int p);
+    void onSetScale(QList<bool>);
     void onSetScale(int n, bool v);
     void onSetScale(int rootNote, QList<bool>);
 
