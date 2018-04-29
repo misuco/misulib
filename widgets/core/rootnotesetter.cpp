@@ -101,17 +101,23 @@ void RootNoteSetter::calcText()
 
 void RootNoteSetter::onPressed()
 {
-    if(_out && _pressed == 0) _vId=_out->noteOn(_freq->getFreq(),_freq->getMidinote(),_freq->getPitch(),127);
-    _pressed++;
+    if(_pressed == 0) {
+        _pressed++;
+        if(_out) {
+            _vId=_out->noteOn(_freq->getFreq(),_freq->getMidinote(),_freq->getPitch(),127);
+        }
+    }
 }
 
 void RootNoteSetter::onReleased()
 {
-    if(_out && _pressed == 1) {
-        _out->noteOff(_vId);
+    if(_pressed == 1) {
         emit setRootNote(_rootNote);
         emit selectedChanged();
+        _pressed--;
+        if(_out) {
+            _out->noteOff(_vId);
+        }
     }
-    _pressed--;
 }
 
