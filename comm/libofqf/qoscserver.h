@@ -37,46 +37,45 @@
  */
 class QOscServer :  public QOscBase, public QOscServerInterface
 {
-	Q_OBJECT
-        friend class PathObject;
-        public:
+    Q_OBJECT
+    friend class PathObject;
+public:
 
-        /**
-		 * Creates an OSC-server that listens on all interfaces on the specified
-		 * port for incoming datagrams.
-		 */
-		QOscServer( quint16 port, QObject* p );
+    /**
+     * Creates an OSC-server that listens on all interfaces on the specified
+     * port for incoming datagrams.
+     */
+    QOscServer( quint16 port, QObject* p );
 
-         /**
-		 * Creates an OSC-server that listens on the specified address and port
-		 * for incoming datagrams.
-		 */
-		QOscServer( QHostAddress address, quint16 port, QObject* p );
+    /**
+     * Creates an OSC-server that listens on the specified address and port
+     * for incoming datagrams.
+     */
+    QOscServer( QHostAddress address, quint16 port, QObject* p );
 
-        ~QOscServer();
+    ~QOscServer();
 
-		/**
-		 * @brief Don't allow changing the socket.
-		 */
-                // virtual void setSocket( QUdpSocket*) {}
-                void registerPathObject( PathObject* );
-                void unregisterPathObject( PathObject* );
+    /**
+     * @brief Don't allow changing the socket.
+     */
+    void registerPathObject( PathObject* );
+    void unregisterPathObject( PathObject* );
 
-        signals:
-                void oscData( QString path, QList<QVariant> data );
+signals:
+    virtual void oscData( QString path, QList<QVariant> data, QHostAddress src_adr, quint16 src_port) = 0;
 
-	private slots:
-		void readyRead();
+private slots:
+    void readyRead();
 
-	private:
-		QList<PathObject*> paths;
-                int decodeState;
-                bool inBundle;
-                QString path;       // osc-path
-                QString args;       // argument string
-                int nargs;          // number of arguments
-                int carg;           // currently parsed argument
-                QVariant arguments; // the parsed arguments
+private:
+    QList<PathObject*> paths;
+    int decodeState;
+    bool inBundle;
+    QString path;       // osc-path
+    QString args;       // argument string
+    int nargs;          // number of arguments
+    int carg;           // currently parsed argument
+    QVariant arguments; // the parsed arguments
 };
 
 #endif // QOSCSERVER_H
