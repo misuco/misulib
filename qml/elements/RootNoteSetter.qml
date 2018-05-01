@@ -12,7 +12,7 @@ Item {
         cellWidth: buttonSize
         cellHeight: buttonSize
 
-        flow: GridView.FlowTopToBottom
+        flow: GridView.FlowLeftToRight
 
         delegate: Rectangle {
             color: modelData.selected ? root.pitchColors[modelData.rootNote].colorOn
