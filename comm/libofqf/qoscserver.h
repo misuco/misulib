@@ -39,6 +39,7 @@ class QOscServer :  public QOscBase, public QOscServerInterface
 {
     Q_OBJECT
     friend class PathObject;
+
 public:
 
     /**
@@ -55,20 +56,14 @@ public:
 
     ~QOscServer();
 
-    /**
-     * @brief Don't allow changing the socket.
-     */
-    void registerPathObject( PathObject* );
-    void unregisterPathObject( PathObject* );
-
 signals:
-    virtual void oscData( QString path, QList<QVariant> data, QHostAddress src_adr, quint16 src_port) = 0;
+    void oscData( QString path, QList<QVariant> data, QHostAddress src_adr, quint16 src_port);
 
 private slots:
     void readyRead();
 
 private:
-    QList<PathObject*> paths;
+    const int BUFFERSIZE=4096;
     int decodeState;
     bool inBundle;
     QString path;       // osc-path
