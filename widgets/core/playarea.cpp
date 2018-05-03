@@ -26,9 +26,10 @@
 #include "lib/misulib/comm/mastersender.h"
 #include <math.h>
 
-PlayArea::PlayArea(MasterSender * ms, QObject *parent) : QObject(parent),
-    out(ms),
-    fcalc(0,this),
+PlayArea::PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QObject *parent) : QObject(parent),
+    _touchHistory(touchhistory),
+    _out(mastersender),
+    _fcalc(0,this),
     _sendCc1(false)
 {
     bendHoriz=false;
@@ -51,8 +52,8 @@ PlayArea::PlayArea(MasterSender * ms, QObject *parent) : QObject(parent),
 
     for(int r=0;r<MAX_ROWS;r++) {
         for(int c=0;c<MAX_COLS;c++) {
-            fields[r][c].setF1rootNote(c%(SCALE_SIZE+1));
-            fields[r][c].setF2rootNote(c%(SCALE_SIZE+1));
+            _fields[r][c].setF1rootNote(c%(SCALE_SIZE+1));
+            _fields[r][c].setF2rootNote(c%(SCALE_SIZE+1));
         }
     }
 
@@ -110,58 +111,58 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
 
     float huePerNote = 1.0/12.0;
     if(bendVertTop!=0) {
-        fields[rows][col].setType(BEND_VERT);
-        fields[rows][col].setF1midiNote(midinote,pitch);
+        _fields[rows][col].setType(BEND_VERT);
+        _fields[rows][col].setF1midiNote(midinote,pitch);
 
-        float hue = fields[rows][col].getF1Hue()+huePerNote*(float)bendVertTop;
-        fields[rows][col].setHue1Bent(hue);
-        fields[rows][col].setPressed(0);
+        float hue = _fields[rows][col].getF1Hue()+huePerNote*(float)bendVertTop;
+        _fields[rows][col].setHue1Bent(hue);
+        _fields[rows][col].setPressed(0);
 
         if(col>1 && bendHoriz) {
-            fields[rows][col-1].setType(BEND_VERT_HORIZ);
-            fields[rows][col-1].setF1midiNote(fields[rows][col-2].getF1midiNote(),fields[rows][col-2].getF1pitch());
+            _fields[rows][col-1].setType(BEND_VERT_HORIZ);
+            _fields[rows][col-1].setF1midiNote(_fields[rows][col-2].getF1midiNote(),_fields[rows][col-2].getF1pitch());
 
-            float hue = fields[rows][col-1].getF1Hue()+huePerNote*(float)bendVertTop;
-            fields[rows][col-1].setHue1Bent(hue);
+            float hue = _fields[rows][col-1].getF1Hue()+huePerNote*(float)bendVertTop;
+            _fields[rows][col-1].setHue1Bent(hue);
 
-            fields[rows][col-1].setF2midiNote(midinote,pitch);
+            _fields[rows][col-1].setF2midiNote(midinote,pitch);
 
-            hue = fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertTop;
-            fields[rows][col-1].setHue2Bent(hue);
-            fields[rows][col-1].setPressed(0);
+            hue = _fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertTop;
+            _fields[rows][col-1].setHue2Bent(hue);
+            _fields[rows][col-1].setPressed(0);
         }
         rows++;
     }
-    fields[rows][col].setType(NORMAL);
-    fields[rows][col].setF1midiNote(midinote,pitch);
-    fields[rows][col].setPressed(0);
+    _fields[rows][col].setType(NORMAL);
+    _fields[rows][col].setF1midiNote(midinote,pitch);
+    _fields[rows][col].setPressed(0);
     if(col>1 && bendHoriz) {
-        fields[rows][col-1].setType(BEND_HORIZ);
-        fields[rows][col-1].setF1midiNote(fields[rows][col-2].getF1midiNote(),fields[rows][col-2].getF1pitch());
-        fields[rows][col-1].setF2midiNote(midinote,pitch);
-        fields[rows][col-1].setPressed(0);
+        _fields[rows][col-1].setType(BEND_HORIZ);
+        _fields[rows][col-1].setF1midiNote(_fields[rows][col-2].getF1midiNote(),_fields[rows][col-2].getF1pitch());
+        _fields[rows][col-1].setF2midiNote(midinote,pitch);
+        _fields[rows][col-1].setPressed(0);
     }
     rows++;
     if(bendVertBot!=0) {
-        fields[rows][col].setType(BEND_VERT);
-        fields[rows][col].setF1midiNote(midinote,pitch);
+        _fields[rows][col].setType(BEND_VERT);
+        _fields[rows][col].setF1midiNote(midinote,pitch);
 
-        float hue = fields[rows][col].getF1Hue()+huePerNote*(float)bendVertBot;
-        fields[rows][col].setHue1Bent(hue);
-        fields[rows][col].setPressed(0);
+        float hue = _fields[rows][col].getF1Hue()+huePerNote*(float)bendVertBot;
+        _fields[rows][col].setHue1Bent(hue);
+        _fields[rows][col].setPressed(0);
 
         if(col>1 && bendHoriz) {
-            fields[rows][col-1].setType(BEND_VERT_HORIZ);
-            fields[rows][col-1].setF1midiNote(fields[rows][col-2].getF1midiNote(),fields[rows][col-2].getF1pitch());
+            _fields[rows][col-1].setType(BEND_VERT_HORIZ);
+            _fields[rows][col-1].setF1midiNote(_fields[rows][col-2].getF1midiNote(),_fields[rows][col-2].getF1pitch());
 
-            float hue = fields[rows][col-1].getF1Hue()+huePerNote*(float)bendVertBot;
-            fields[rows][col-1].setHue1Bent(hue);
+            float hue = _fields[rows][col-1].getF1Hue()+huePerNote*(float)bendVertBot;
+            _fields[rows][col-1].setHue1Bent(hue);
 
-            fields[rows][col-1].setF2midiNote(midinote,pitch);
+            _fields[rows][col-1].setF2midiNote(midinote,pitch);
 
-            hue = fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertBot;
-            fields[rows][col-1].setHue2Bent(hue);
-            fields[rows][col-1].setPressed(0);
+            hue = _fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertBot;
+            _fields[rows][col-1].setHue2Bent(hue);
+            _fields[rows][col-1].setPressed(0);
         }
         rows++;
     }
@@ -181,7 +182,7 @@ void PlayArea::calcGeo()
 
 int PlayArea::getMidinoteAtField(int i)
 {
-    return fields[0][i].getF1midiNote();
+    return _fields[0][i].getF1midiNote();
 }
 
 int PlayArea::getColumnCount()
@@ -209,7 +210,7 @@ int PlayArea::getPlayFieldHeight()
     return _playFieldHeight;
 }
 
-void PlayArea::processTouchEvent(misuTouchEvent e)
+void PlayArea::processTouchEvent(misuTouchEvent &e)
 {
     //qDebug() << "MWPlayArea::processPoint " << e.id << " x " << e.x << " y " << e.y << " t " << e.t;
 
@@ -218,6 +219,7 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         return;
     }
 
+    float hue=0;
     int eventHash=e.id%64;
     eventStackElement * es = &eventStack[eventHash];
     es->x=e.x;
@@ -230,7 +232,7 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
     float yrel=(float)(e.y-row*rowheight[row])/(float)rowheight[row];
     float xrel=(float)(e.x-col*colwidth[col])/(float)colwidth[col];
 
-    Playfield * pf = &fields[row][col];
+    Playfield * pf = &_fields[row][col];
     //qDebug() << "row " << row << " col " << col << " eventHash " << eventHash;
 
     float freq;
@@ -240,12 +242,20 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
 
     float freqdiff;
     int pitchdiff;
+    int huediff;
 
     switch(pf->getType()) {
     case BEND_HORIZ:
         freqdiff=pf->getF2freq()-pf->getF1freq();
         freqdiff*=xrel;
         freq=pf->getF1freq()+freqdiff;
+
+        huediff = pf->getF2Hue()-pf->getF1Hue();
+        huediff*=xrel;
+        hue = pf->getF1Hue()+huediff;
+        if(hue>1) hue-=1;
+        if(hue<0) hue+=1;
+
         pitchdiff=pf->getF2midiNote()*8192-pf->getF1midiNote()*8192;
         pitchdiff+=pf->getF2pitch();
         pitchdiff-=pf->getF1midiNote();
@@ -268,8 +278,9 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         }
         midinote=round(pitchdiff/100);
         //pcalc.setPitch(pitchdiff-midinote*100);
-        fcalc.setMidinote(midinote,pitchdiff-midinote*100);
-        freq=fcalc.getFreq();
+        _fcalc.setMidinote(midinote,pitchdiff-midinote*100);
+        freq=_fcalc.getFreq();
+        hue=_fcalc.getHue();
         break;
 
     case BEND_VERT:
@@ -284,8 +295,9 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         midinote=round(pitchdiff/100);
         pitch = pitchdiff-midinote*100;
         //pcalc.setPitch(pitch);
-        fcalc.setMidinote(midinote,pitch);
-        freq=fcalc.getFreq();
+        _fcalc.setMidinote(midinote,pitch);
+        freq=_fcalc.getFreq();
+        hue=_fcalc.getHue();
         //qDebug() << "midinote " << midinote << " pitch " << pitch << " freq " << freq  << " bendVert " << bendVertTop << " " << bendVertBot << " pitchdiff " << pitchdiff;
         break;
 
@@ -293,6 +305,7 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         freq=pf->getF1freq();
         midinote=pf->getF1midiNote();
         pitch=pf->getF1pitch();
+        hue=pf->getF1Hue();
         break;
     }
 
@@ -303,36 +316,36 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         es->row=row;
         es->col=col;
         es->f=freq;
-        es->voiceId=out->noteOn(freq,midinote,pitch,velocity);
+        es->voiceId=_out->noteOn(freq,midinote,pitch,velocity);
         pf->incPressed();
         break;
 
     case Qt::TouchPointMoved:
         if(row!=es->row || col!=es->col) {
-            Playfield * ppf = &fields[es->row][es->col];
+            Playfield * ppf = &_fields[es->row][es->col];
             ppf->decPressed();
-            out->noteOff(es->voiceId);
+            _out->noteOff(es->voiceId);
 
             es->midinote=midinote;
-            es->voiceId=out->noteOn(freq,midinote,pitch,velocity);
+            es->voiceId=_out->noteOn(freq,midinote,pitch,velocity);
 
             es->row=row;
             es->col=col;
             es->f=freq;
             pf->incPressed();
         } else if(freq!=es->f) {
-            out->pitch(es->voiceId,freq,midinote,pitch);
+            _out->pitch(es->voiceId,freq,midinote,pitch);
             es->f=freq;
         }
 
         if(_sendCc1) {
-            out->cc(es->voiceId,1,1.0f-yrel,1.0f-yrel);
+            _out->cc(es->voiceId,1,1.0f-yrel,1.0f-yrel);
         }
         break;
 
     case Qt::TouchPointReleased:
 
-        out->noteOff(es->voiceId);
+        _out->noteOff(es->voiceId);
         if(pf->getPressed()>0) pf->decPressed();
 
         es->eventId=-1;
@@ -341,6 +354,8 @@ void PlayArea::processTouchEvent(misuTouchEvent e)
         break;
     }
     pf->calcColor();
+
+    if(_touchHistory) _touchHistory->insert(e.x,e.y,hue);
 }
 
 void PlayArea::onSetRootNote(int p)
@@ -376,7 +391,7 @@ void PlayArea::onPitchChange(int rootNote, int pitch)
 {
     for(int col=0;col<MAX_COLS;col++) {
         for(int row=0;row<MAX_ROWS;row++) {
-            fields[row][col].onPitchChange(rootNote,pitch);
+            _fields[row][col].onPitchChange(rootNote,pitch);
         }
     }
 }
@@ -408,7 +423,7 @@ void PlayArea::onBwModeChange(bool state)
 {
     for(int r=0;r<MAX_ROWS;r++) {
         for(int c=0;c<MAX_COLS;c++) {
-            fields[r][c].setBwMode(state);
+            _fields[r][c].setBwMode(state);
         }
     }
 }
@@ -417,7 +432,7 @@ void PlayArea::onSymbolsChange(int noteSymbols)
 {
     for(int r=0;r<MAX_ROWS;r++) {
         for(int c=0;c<MAX_COLS;c++) {
-            fields[r][c].setNoteSymbols(noteSymbols);
+            _fields[r][c].setNoteSymbols(noteSymbols);
         }
     }
 }
@@ -426,7 +441,7 @@ void PlayArea::onShowFreqsChange(bool showFreqs)
 {
     for(int r=0;r<MAX_ROWS;r++) {
         for(int c=0;c<MAX_COLS;c++) {
-            fields[r][c].showFreqs(showFreqs);
+            _fields[r][c].showFreqs(showFreqs);
         }
     }
 }
@@ -447,7 +462,6 @@ void PlayArea::onPressed(int id, int x, int y)
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointPressed;
-    e.t=QDateTime::currentMSecsSinceEpoch();
     processTouchEvent(e);
 }
 
@@ -459,7 +473,6 @@ void PlayArea::onUpdated(int id, int x, int y)
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointMoved;
-    e.t=QDateTime::currentMSecsSinceEpoch();
     processTouchEvent(e);
 }
 
@@ -471,7 +484,6 @@ void PlayArea::onReleased(int id, int x, int y)
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointReleased;
-    e.t=QDateTime::currentMSecsSinceEpoch();
     processTouchEvent(e);
 }
 
@@ -479,8 +491,8 @@ QList<QObject *> PlayArea::row0()
 {
     QList<QObject*> colsList;
     for(int j=0;j<cols;j++) {
-        fields[0][j].calcColor();
-        colsList.append(&fields[0][j]);
+        _fields[0][j].calcColor();
+        colsList.append(&_fields[0][j]);
     }
     return colsList;
 }
@@ -489,8 +501,8 @@ QList<QObject *> PlayArea::row1()
 {
     QList<QObject*> colsList;
     for(int j=0;j<cols;j++) {
-        fields[1][j].calcColor();
-        colsList.append(&fields[1][j]);
+        _fields[1][j].calcColor();
+        colsList.append(&_fields[1][j]);
     }
     return colsList;
 }
@@ -499,8 +511,8 @@ QList<QObject *> PlayArea::row2()
 {
     QList<QObject*> colsList;
     for(int j=0;j<cols;j++) {
-        fields[2][j].calcColor();
-        colsList.append(&fields[2][j]);
+        _fields[2][j].calcColor();
+        colsList.append(&_fields[2][j]);
     }
     return colsList;
 }

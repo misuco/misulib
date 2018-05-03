@@ -23,6 +23,7 @@
 
 #include "lib/misulib/models/types.h"
 #include "lib/misulib/comm/mastersender.h"
+#include "lib/misulib/widgets/core/touchhistory.h"
 #include "lib/misulib/models/playfield.h"
 
 #define MAX_COLS 255
@@ -51,9 +52,9 @@ public:
         float f;
     };
 
-    PlayArea(MasterSender * ms, QObject *parent);
+    PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QObject *parent);
     ~PlayArea();
-    virtual void processTouchEvent(misuTouchEvent e);
+    virtual void processTouchEvent(misuTouchEvent &e);
 
     Q_INVOKABLE void resize(int w, int h);
     Q_INVOKABLE void onPressed(int id, int x, int y);
@@ -91,6 +92,7 @@ signals:
 
 private:
     // INFRASTRUCTURE
+    TouchHistory * _touchHistory;
 
     // - scale model
     int _baseOct;
@@ -108,15 +110,17 @@ private:
     int _playFieldHeight;
 
     // - networking
-    MasterSender * out;
+    MasterSender * _out;
+
     // - processing
-    FreqTriple fcalc;
+    FreqTriple _fcalc;
 
     // WORKING MEMORY
     // - touch field configuration
-    Playfield fields[MAX_ROWS][MAX_COLS];
+    Playfield _fields[MAX_ROWS][MAX_COLS];
     int rows;
     int cols;
+
     // - event stack/hashmap
     eventStackElement eventStack[EVENT_STACK_SIZE];
 

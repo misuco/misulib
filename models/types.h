@@ -54,7 +54,6 @@ struct misuTouchEvent {
     int x;
     int y;
     int state;
-    long t;
 };
 
 #endif // TYPES_H
