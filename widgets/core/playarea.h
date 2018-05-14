@@ -26,9 +26,9 @@
 #include "lib/misulib/widgets/core/touchhistory.h"
 #include "lib/misulib/models/playfield.h"
 
-#define MAX_COLS 255
-#define MAX_ROWS 3
-#define EVENT_STACK_SIZE 64
+const int MAX_COLS=255;
+const int MAX_ROWS=3;
+const int EVENT_STACK_SIZE=64;
 
 class PlayArea : public QObject
 {

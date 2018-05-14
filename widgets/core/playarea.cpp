@@ -228,6 +228,11 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
 
     if(_playAreaHeight>0) row = e.y*rows/_playAreaHeight;
     int col=e.x*cols/_playAreaWidth;
+    // clip
+    if(col<0) col=0;
+    if(col>=MAX_COLS) col=MAX_COLS-1;
+    if(row<0) row=0;
+    if(row>=MAX_ROWS) row=MAX_ROWS-1;
 
     float yrel=(float)(e.y-row*rowheight[row])/(float)rowheight[row];
     float xrel=(float)(e.x-col*colwidth[col])/(float)colwidth[col];
