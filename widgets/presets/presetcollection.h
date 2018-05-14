@@ -19,8 +19,10 @@ public:
     Q_INVOKABLE void closeDialogPreset();
     Q_INVOKABLE void overwritePreset();
     Q_INVOKABLE void buyPresetManager();
+    Q_INVOKABLE void importSong();
 
     void append(QObject * item);
+    void clear();
 
     QList<QObject *> getItems();
     QObject * getItem(int i);
@@ -29,6 +31,7 @@ public:
 signals:
     void layoutChange();
     void itemsChange();
+    void showImportSong();
 
 private slots:
     void onEditPreset();

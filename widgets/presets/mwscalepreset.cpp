@@ -33,8 +33,9 @@ MWScalePreset::MWScalePreset(QObject *parent): QObject(parent)
     _pressed=0;
 }
 
-MWScalePreset::MWScalePreset(int rootNote, QList<bool> scale, QObject *parent): QObject(parent)
+MWScalePreset::MWScalePreset(int rootNote, QList<bool> scale, QString text, QObject *parent): QObject(parent)
 {
+    _text=text;
     _presetRootNote=rootNote;
     _presetScale = scale;
     _scaleSize = 2 + _presetScale.count(true);
@@ -53,6 +54,11 @@ QStringList MWScalePreset::scale()
         else l.append("0");
     }
     return l;
+}
+
+QString MWScalePreset::getText()
+{
+    return _text;
 }
 
 int MWScalePreset::getRootNote()

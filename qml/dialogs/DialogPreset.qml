@@ -113,6 +113,31 @@ Item {
                     }
                 }
 
+                Rectangle {
+                    width: portrait ? buttonSize*1.5 : buttonSize*2
+                    height: buttonSize
+                    radius: buttonRadius
+                    color: bgColor
+                    border.width: 1
+                    border.color: fgColor
+
+                    Text {
+                        anchors.fill: parent
+                        text: "import"
+                        color: fgColor
+                        font.pixelSize: fontSize2
+                        horizontalAlignment: Qt.AlignHCenter
+                        verticalAlignment: Qt.AlignVCenter
+                    }
+
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        onPressed: {
+                            layout.scalePresets.importSong();
+                        }
+                    }
+                }
+
             }
         }
     }
