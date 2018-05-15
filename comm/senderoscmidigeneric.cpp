@@ -65,6 +65,7 @@ void SenderOscMidiGeneric::noteOff(int voiceId)
     QString path;
     v.append(notestate[voiceId%1024]);
     v.append(0);
+    v.append(_channel);
     path.sprintf("/note/%d",_channel);
     sendOsc(path,v);
 }
