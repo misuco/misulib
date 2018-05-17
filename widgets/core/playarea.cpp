@@ -54,6 +54,7 @@ PlayArea::PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QOb
         for(int c=0;c<MAX_COLS;c++) {
             _fields[r][c].setF1rootNote(c%(SCALE_SIZE+1));
             _fields[r][c].setF2rootNote(c%(SCALE_SIZE+1));
+            _fields[r][c].setPressed(0);
         }
     }
 
@@ -103,6 +104,19 @@ void PlayArea::config()
         calcGeo();
         emit playRowsChanged();
     }
+
+    // update touch points by "moving" them
+    for(int i=0;i<EVENT_STACK_SIZE;i++) {
+        eventStackElement * es = &eventStack[i];
+        if(es->eventId>=0) {
+            misuTouchEvent e;
+            e.state=Qt::TouchPointMoved;
+            e.id=es->eventId;
+            e.x=es->x;
+            e.y=es->y;
+            processTouchEvent(e);
+        }
+    }
 }
 
 void PlayArea::setColumn(int col, int midinote, int pitch) {
@@ -116,7 +130,7 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
 
         float hue = _fields[rows][col].getF1Hue()+huePerNote*(float)bendVertTop;
         _fields[rows][col].setHue1Bent(hue);
-        _fields[rows][col].setPressed(0);
+        //_fields[rows][col].setPressed(0);
 
         if(col>1 && bendHoriz) {
             _fields[rows][col-1].setType(BEND_VERT_HORIZ);
@@ -129,18 +143,18 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
 
             hue = _fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertTop;
             _fields[rows][col-1].setHue2Bent(hue);
-            _fields[rows][col-1].setPressed(0);
+            //_fields[rows][col-1].setPressed(0);
         }
         rows++;
     }
     _fields[rows][col].setType(NORMAL);
     _fields[rows][col].setF1midiNote(midinote,pitch);
-    _fields[rows][col].setPressed(0);
+    //_fields[rows][col].setPressed(0);
     if(col>1 && bendHoriz) {
         _fields[rows][col-1].setType(BEND_HORIZ);
         _fields[rows][col-1].setF1midiNote(_fields[rows][col-2].getF1midiNote(),_fields[rows][col-2].getF1pitch());
         _fields[rows][col-1].setF2midiNote(midinote,pitch);
-        _fields[rows][col-1].setPressed(0);
+        //_fields[rows][col-1].setPressed(0);
     }
     rows++;
     if(bendVertBot!=0) {
@@ -149,7 +163,7 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
 
         float hue = _fields[rows][col].getF1Hue()+huePerNote*(float)bendVertBot;
         _fields[rows][col].setHue1Bent(hue);
-        _fields[rows][col].setPressed(0);
+        //_fields[rows][col].setPressed(0);
 
         if(col>1 && bendHoriz) {
             _fields[rows][col-1].setType(BEND_VERT_HORIZ);
@@ -162,7 +176,7 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
 
             hue = _fields[rows][col-1].getF2Hue()+huePerNote*(float)bendVertBot;
             _fields[rows][col-1].setHue2Bent(hue);
-            _fields[rows][col-1].setPressed(0);
+            //_fields[rows][col-1].setPressed(0);
         }
         rows++;
     }
@@ -212,7 +226,7 @@ int PlayArea::getPlayFieldHeight()
 
 void PlayArea::processTouchEvent(misuTouchEvent &e)
 {
-    //qDebug() << "MWPlayArea::processPoint " << e.id << " x " << e.x << " y " << e.y << " t " << e.t;
+    //qDebug() << "MWPlayArea::processPoint " << e.id << " x " << e.x << " y " << e.y << " state " << e.state;
 
     if(e.id<0) {
         qDebug() << "ignoring touch event with negative id " << e.id;
@@ -220,25 +234,28 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
     }
 
     float hue=0;
-    int eventHash=e.id%64;
+    int eventHash=e.id%EVENT_STACK_SIZE;
     eventStackElement * es = &eventStack[eventHash];
+
     es->x=e.x;
     es->y=e.y;
+
+    // clip
+    if(e.x<0) e.x=0;
+    if(e.x>=_playAreaWidth) e.x=_playAreaWidth-1;
+    if(e.y<0) e.y=0;
+    if(e.y>=_playAreaHeight) e.y=_playAreaHeight-1;
+
     int row=0;
 
     if(_playAreaHeight>0) row = e.y*rows/_playAreaHeight;
     int col=e.x*cols/_playAreaWidth;
-    // clip
-    if(col<0) col=0;
-    if(col>=MAX_COLS) col=MAX_COLS-1;
-    if(row<0) row=0;
-    if(row>=MAX_ROWS) row=MAX_ROWS-1;
 
     float yrel=(float)(e.y-row*rowheight[row])/(float)rowheight[row];
     float xrel=(float)(e.x-col*colwidth[col])/(float)colwidth[col];
 
     Playfield * pf = &_fields[row][col];
-    //qDebug() << "row " << row << " col " << col << " eventHash " << eventHash;
+    //qDebug() << "row " << row << " col " << col << " eventHash " << eventHash << " " << pf;
 
     float freq;
     int midinote;
@@ -350,8 +367,14 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
 
     case Qt::TouchPointReleased:
 
+        if(row!=es->row || col!=es->col) {
+            Playfield * ppf = &_fields[es->row][es->col];
+            if(ppf->getPressed()>0) ppf->decPressed();
+        } else {
+            if(pf->getPressed()>0) pf->decPressed();
+        }
+
         _out->noteOff(es->voiceId);
-        if(pf->getPressed()>0) pf->decPressed();
 
         es->eventId=-1;
         es->row=-1;
