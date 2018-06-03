@@ -16,7 +16,7 @@ void TouchHistory::insert(int x, int y, float hue)
 {
     TouchHistoryEvent * event = qobject_cast<TouchHistoryEvent *>(_events.at(nextInsertAt));
     if(event) {
-        qDebug() << "TouchHistory::insert " << x << " " << y << " " << hue;
+        //qDebug() << "TouchHistory::insert " << x << " " << y << " " << hue;
         event->set(x,y,hue,QDateTime::currentMSecsSinceEpoch());
         nextInsertAt++;
         if(nextInsertAt>=_events.size()) nextInsertAt=0;
