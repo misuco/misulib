@@ -18,6 +18,8 @@
  */
 
 #include "mastersender.h"
+#include "senderthread.h"
+#include "sendermobilesynth.h"
 
 MasterSender::MasterSender(QObject *parent) : QObject(parent)
 {
@@ -53,6 +55,7 @@ void MasterSender::pc(int v1)
     for(int i=0;i<senders.count();i++) {
         if(senderEnabled[i]) senders.at(i)->pc(v1);
     }
+    emit sigPc(v1);
 }
 
 int MasterSender::noteOn(float f, int midinote, int pitch, int v)
@@ -65,6 +68,7 @@ int MasterSender::noteOn(float f, int midinote, int pitch, int v)
             //qDebug() << "SenderMulti::noteOn(sender:" << i << ",chan:" << chan << ",vid:" << vid << ",f:" << f << ",midinote:" << midinote << "," << pitch << "," << v << ")";
         }
     }
+    emit sigNoteOn(vid,f,midinote,pitch,v);
     onCnt++;
 
     return vid;
@@ -78,6 +82,7 @@ void MasterSender::noteOff(int voiceId)
             //qDebug() << "SenderMulti::noteOff(" <<  voiceId  << ")";
         }
     }
+    emit sigNoteOff(voiceId);
     onCnt--;
 }
 
@@ -87,6 +92,7 @@ void MasterSender::pitch(int voiceId, float f, int midinote, int pitch)
     for(int i=0;i<senders.count();i++) {
         if(senderEnabled[i]) senders.at(i)->pitch(voiceId,f,midinote,pitch);
     }
+    emit sigPitch(voiceId,f,midinote,pitch);
 }
 
 void MasterSender::setDestination(char * a, int p)
@@ -106,6 +112,20 @@ void MasterSender::addSender(ISender *s)
 {
     senders.append(s);
     senderEnabled.append(true);
+}
+
+void MasterSender::addSenderThread(QObject *s)
+{
+    QThread * t = new SenderThread();
+    t->setObjectName("SenderThread XY");
+    t->start(QThread::TimeCriticalPriority);
+    s->moveToThread(t);
+    //SenderMobileSynth* s1=qobject_cast<SenderMobileSynth*>(s);
+    connect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
+    connect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
+    connect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
+    connect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
+    connect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
 }
 
 void MasterSender::onToggleSender(int i, bool value)

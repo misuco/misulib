@@ -22,7 +22,7 @@
 
 #ifdef Q_OS_IOS
 
-SenderMobileSynth::SenderMobileSynth()
+SenderMobileSynth::SenderMobileSynth(QObject * parent) : QObject(parent)
 {
     
     syco=new mobilesynthview::Widget();
@@ -79,14 +79,9 @@ void SenderMobileSynth::pitch(int voiceId, float f, int, int) {
     sy->NoteOn(voiceId, (float)f);
 }
 
-void SenderMobileSynth::setDestination(char *,int)
-{
-
-}
-
 #else
 
-SenderMobileSynth::SenderMobileSynth()
+SenderMobileSynth::SenderMobileSynth(QObject * parent) : QObject(parent)
 {
     sy= new mobileSynthQT52();
     //qDebug() << "mobileSynthQt52 created";
@@ -141,7 +136,5 @@ void SenderMobileSynth::noteOff(int voiceId)
 void SenderMobileSynth::pitch(int voiceId, float f, int, int) {
     sy->noteOn(voiceId, (float)f);
 }
-
-void SenderMobileSynth::setDestination(char *, int) {}
 
 #endif

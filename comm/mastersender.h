@@ -27,6 +27,8 @@
 
 class MasterSender : public QObject
 {
+    Q_OBJECT
+
 public:
     explicit MasterSender(QObject * parent = nullptr);
     ~MasterSender();
@@ -40,7 +42,15 @@ public:
     void reconnect();
 
     void setDestination(int i, char * a,int p);
-    void addSender(ISender * s);
+    void addSender(ISender * s);    
+    void addSenderThread(QObject *s);
+
+signals:
+    void sigCc(int nextVoiceId, int cc, float v1, float v1avg);
+    void sigPc(int v1);
+    int sigNoteOn(int vid, float f, int midinote, int pitch, int v);
+    void sigNoteOff(int voiceId);
+    void sigPitch(int voiceId, float f, int midinote, int pitch);
 
 public slots:
     void onToggleSender(int i, bool value);
@@ -48,6 +58,8 @@ public slots:
 private:
     QList<ISender *> senders;
     QList<bool> senderEnabled;
+
+    QList<QObject *> senderThreads;
 
     int nextVoiceId;
 
