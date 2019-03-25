@@ -114,10 +114,10 @@ void MasterSender::addSender(ISender *s)
     senderEnabled.append(true);
 }
 
-void MasterSender::addSenderThread(QObject *s)
+void MasterSender::addSenderThread(QObject *s, QString name)
 {
     QThread * t = new SenderThread();
-    t->setObjectName("SenderThread XY");
+    t->setObjectName(name);
     t->start(QThread::TimeCriticalPriority);
     s->moveToThread(t);
     //SenderMobileSynth* s1=qobject_cast<SenderMobileSynth*>(s);

@@ -51,16 +51,18 @@ void SenderQMidi::noteOn(int voiceId, float f, int midinote, int pitch, int vel)
 {    
     _noteOnCount[midinote]++;
     _voiceId2Midinote[voiceId%64]=midinote;
-    _midiOut->noteOn(midinote+2,1,vel);
-    _midiOut->pitchWheel(1,pitch);
+    _midiOut->noteOn(midinote+2,0,vel);
+    _midiOut->pitchWheel(0,pitch);
 }
 
 void SenderQMidi::noteOff(int voiceId)
 {
-    int midinote = _voiceId2Midinote[voiceId];
-    _noteOnCount[midinote]--;
-    if(_noteOnCount[midinote+2]<1) {
-        _midiOut->noteOff(midinote,1);
+    int midinote = _voiceId2Midinote[voiceId%64];
+    if(midinote < 128) {
+        _noteOnCount[midinote]--;
+        if(_noteOnCount[midinote]<1) {
+            _midiOut->noteOff(midinote+2,0);
+        }
     }
 }
 

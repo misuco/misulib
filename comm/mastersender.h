@@ -43,7 +43,7 @@ public:
 
     void setDestination(int i, char * a,int p);
     void addSender(ISender * s);    
-    void addSenderThread(QObject *s);
+    void addSenderThread(QObject *s, QString name);
 
 signals:
     void sigCc(int nextVoiceId, int cc, float v1, float v1avg);
