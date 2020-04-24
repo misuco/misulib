@@ -33,8 +33,8 @@ public:
     virtual int noteOn(float f, int midinote, int pitch, int v);
     virtual void noteOn(int voiceId, float f, int midinote, int pitch, int vel);
     virtual void noteOff(int voiceId);
-    virtual void pitch(int voiceId, float f, int midinote, int pitch);
-    virtual void setDestination(char * a,int p);
+    virtual void pitch(int voiceId, float freq, int midinote, int pitch);
+    virtual void setDestination(char * a, int p);
     virtual void reconnect();
     virtual int getPort() {return port;}
     virtual char* getAddress() {return adr;}
@@ -44,12 +44,13 @@ public:
 private:
     QOscClientInterface* oscout;
     char * adr;
-    int port;
+    quint16 port;
     int _channel;
 
     int prog;              // current program
-    quint8 * notestate;   // currently played notes
-    quint8 * notechan;    // currently played notes chan
+    int * notestate;   // currently played notes
+    int * notechan;    // currently played notes chan
+    int * notevel;    // currently played notes velocity
     int * ccstate;       // current ccval;
 
     void sendOsc(QString path, QVariant list);

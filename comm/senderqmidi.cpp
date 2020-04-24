@@ -43,6 +43,7 @@ SenderQMidi::~SenderQMidi()
 
 void SenderQMidi::cc(int voiceId, int cc, float v1, float)
 {
+    _midiOut->controlChange(voiceId,cc,v1*127.0f);
 }
 
 void SenderQMidi::pc(int) {}
@@ -67,5 +68,6 @@ void SenderQMidi::noteOff(int voiceId)
 }
 
 void SenderQMidi::pitch(int voiceId, float f, int midinote, int pitch) {
+    _midiOut->pitchWheel(0,pitch);
 }
 

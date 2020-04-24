@@ -26,12 +26,14 @@ SenderReaktor::SenderReaktor()
     port=3150;
     oscout=new QOscClient();
     oscout->setAddress(adr,port);
-    notestate=new quint8[1024];
-    notechan=new quint8[1024];
+    notestate=new int[1024];
+    notechan=new int[1024];
+    notevel=new int[1024];
     ccstate=new int[1024];
     for(int i=0;i<1024;i++) {
         notestate[i]=0;
         notechan[i]=0;
+        notevel[i]=0;
         ccstate[i]=0;
     }
     prog=0;
@@ -50,6 +52,7 @@ int SenderReaktor::noteOn(float, int, int, int)
 
 void SenderReaktor::noteOn(int voiceId, float, int midinote, int pitch, int vel)
 {
+    //qDebug() << " SenderReaktor::noteOn " << voiceId << " " << midinote << " " << pitch ;
     QVariantList v;
     v.append(midinote);
     v.append(vel);
@@ -62,10 +65,13 @@ void SenderReaktor::noteOn(int voiceId, float, int midinote, int pitch, int vel)
     sendOsc(path,v);
     notechan[voiceId%1024]=_channel;
     notestate[voiceId%1024]=midinote;
+    notevel[voiceId%1024]=vel;
 }
 
 void SenderReaktor::noteOff(int voiceId)
 {
+    //qDebug() << " SenderReaktor::noteOff " << voiceId ;
+
     QVariantList v;
     QString path;
     v.append(notestate[voiceId%1024]);
@@ -74,14 +80,20 @@ void SenderReaktor::noteOff(int voiceId)
     sendOsc(path,v);
 }
 
-void SenderReaktor::pitch(int, float, int, int pitch)
+void SenderReaktor::pitch(int voiceId, float freq, int midinote, int pitch)
 {
+    qDebug() << " SenderReaktor::pitch " << voiceId << " " << midinote << " " << pitch ;
     QVariantList v;
     QString path;
 
-    v.append(pitch*64);
-    path.sprintf("/pitch/%d",_channel);
-    sendOsc(path,v);
+    if(notestate[voiceId%1024]!=midinote) {
+        noteOff(voiceId);
+        noteOn(voiceId, freq, midinote, pitch, notevel[voiceId%1024]);
+    } else {
+        v.append(pitch*64);
+        path.sprintf("/pitch/%d",_channel);
+        sendOsc(path,v);
+    }
 }
 
 void SenderReaktor::setDestination(char * a, int p)
@@ -90,7 +102,7 @@ void SenderReaktor::setDestination(char * a, int p)
     adr=new char[strlen(a)];
     strcpy(adr,a);
     port=p;
-    oscout->setAddress(adr,p);
+    oscout->setAddress(adr,port);
 }
 
 void SenderReaktor::reconnect()
@@ -119,7 +131,7 @@ void SenderReaktor::cc(int, int cc, float, float v1avg)
     //qDebug() <<  "SenderOscPuredata::cc " << cc << " v1 " << v1;
 
     // translate value to midi
-    int v1mid=(float)127*v1avg;
+    int v1mid=qRound(127.0f*v1avg);
 
     // translate cc numbers
     if(v1mid!=ccstate[cc]) {
