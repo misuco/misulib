@@ -41,7 +41,11 @@ public slots:
 private:
     QMidiOut * _midiOut;
     int     _voiceId2Midinote[64];
+    int     _voiceId2Velocity[64];
     int     _noteOnCount[128];
+
+    void midiNoteOff(int midinote);
+
 };
 
 #endif // SENDERQMIDI_H

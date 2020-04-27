@@ -41,17 +41,18 @@ SenderQMidi::~SenderQMidi()
     delete(_midiOut);
 }
 
-void SenderQMidi::cc(int voiceId, int cc, float v1, float)
+void SenderQMidi::cc(int, int, float, float)
 {
     _midiOut->controlChange(voiceId,cc,v1*127.0f);
 }
 
 void SenderQMidi::pc(int) {}
 
-void SenderQMidi::noteOn(int voiceId, float f, int midinote, int pitch, int vel)
+void SenderQMidi::noteOn(int voiceId, float, int midinote, int pitch, int vel)
 {    
     _noteOnCount[midinote]++;
     _voiceId2Midinote[voiceId%64]=midinote;
+    _voiceId2Velocity[voiceId%64]=vel;
     _midiOut->noteOn(midinote+2,0,vel);
     _midiOut->pitchWheel(0,pitch);
 }
@@ -59,6 +60,21 @@ void SenderQMidi::noteOn(int voiceId, float f, int midinote, int pitch, int vel)
 void SenderQMidi::noteOff(int voiceId)
 {
     int midinote = _voiceId2Midinote[voiceId%64];
+    midiNoteOff(midinote);
+}
+
+void SenderQMidi::pitch(int voiceId, float f, int midinote, int pitch) {
+    int currentMidinote = _voiceId2Midinote[voiceId%64];
+    if(currentMidinote!=midinote) {
+        midiNoteOff(midinote);
+        noteOn(voiceId,f,midinote,pitch,_voiceId2Velocity[voiceId%64]);
+    } else {
+        _midiOut->pitchWheel(0,pitch);
+    }
+}
+
+void SenderQMidi::midiNoteOff(int midinote)
+{
     if(midinote < 128) {
         _noteOnCount[midinote]--;
         if(_noteOnCount[midinote]<1) {
@@ -66,8 +82,3 @@ void SenderQMidi::noteOff(int voiceId)
         }
     }
 }
-
-void SenderQMidi::pitch(int voiceId, float f, int midinote, int pitch) {
-    _midiOut->pitchWheel(0,pitch);
-}
-
