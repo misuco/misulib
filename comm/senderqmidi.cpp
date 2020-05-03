@@ -41,7 +41,7 @@ SenderQMidi::~SenderQMidi()
     delete(_midiOut);
 }
 
-void SenderQMidi::cc(int, int, float, float)
+void SenderQMidi::cc(int voiceId, int cc, float v1, float)
 {
     _midiOut->controlChange(voiceId,cc,v1*127.0f);
 }
