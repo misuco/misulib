@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "senderreaktor.h"
 #include "lib/misulib/comm/libofqf/qoscclient.h"
 
-SenderReaktor::SenderReaktor()
+SenderReaktor::SenderReaktor(QObject *parent) : QObject(parent)
 {
     adr=new char[16];
     strcpy(adr,"255.255.255.255");
@@ -43,11 +43,6 @@ SenderReaktor::~SenderReaktor()
 {
     delete(ccstate);
     delete(oscout);
-}
-
-int SenderReaktor::noteOn(float, int, int, int)
-{
-    return 0;
 }
 
 void SenderReaktor::noteOn(int voiceId, float, int midinote, int pitch, int vel)

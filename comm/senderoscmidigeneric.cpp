@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "senderoscmidigeneric.h"
 #include "lib/misulib/comm/libofqf/qoscclient.h"
 
-SenderOscMidiGeneric::SenderOscMidiGeneric()
+SenderOscMidiGeneric::SenderOscMidiGeneric(QObject *parent) : QObject(parent)
 {
     adr=new char[16];
     strcpy(adr,"255.255.255.255");

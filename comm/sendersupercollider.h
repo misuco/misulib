@@ -20,24 +20,29 @@
 #ifndef SENDERSUPERCOLLIDER_H
 #define SENDERSUPERCOLLIDER_H
 
-#include "isender.h"
+#include <QObject>
 #include "lib/misulib/comm/libofqf/qoscclientinterface.h"
 
-class SenderSuperCollider : public ISender
+class SenderSuperCollider : public QObject
 {
+
+Q_OBJECT
+
 public:
-    SenderSuperCollider();
+    explicit SenderSuperCollider(QObject * parent = nullptr);
     ~SenderSuperCollider();
-    virtual void cc(int voiceId, int cc, float v1, float);
-    virtual void pc(int v1);
-    virtual int noteOn(float f, int midinote, int pitch, int vel);
-    virtual void noteOn(int voiceId, float f, int midinote, int pitch, int v);
-    virtual void noteOff(int voiceId);
-    virtual void pitch(int voiceId, float f, int midinote, int pitch);
+
     virtual void setDestination(char * a,int p);
     virtual void reconnect();
     virtual int getPort() {return port;}
     virtual char* getAddress() {return adr;}
+
+public slots:
+    void cc(int voiceId, int cc, float v1, float v1avg);
+    void pc(int v1);
+    void noteOn(int voiceId, float f, int midinote, int pitch, int v);
+    void noteOff(int voiceId);
+    void pitch(int voiceId, float f, int, int);
 
 private:
     QOscClientInterface* oscout;

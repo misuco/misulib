@@ -22,7 +22,6 @@
 
 #include <QObject>
 #include <QtGlobal>
-#include "isender.h"
 #ifdef Q_OS_IOS
 #include "lib/mobilesynth/mobilesynthviewcontrollerrc1.hpp"
 #include "lib/mobilesynth/synth/controller.h"
