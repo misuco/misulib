@@ -229,7 +229,7 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
     //qDebug() << "MWPlayArea::processPoint " << e.id << " x " << e.x << " y " << e.y << " state " << e.state;
 
     if(e.id<0) {
-        qDebug() << "ignoring touch event with negative id " << e.id;
+        //qDebug() << "ignoring touch event with negative id " << e.id;
         return;
     }
 
@@ -278,17 +278,18 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
         if(hue>1) hue-=1;
         if(hue<0) hue+=1;
 
-        pitchdiff=pf->getF2midiNote()*8192-pf->getF1midiNote()*8192;
+        pitchdiff=pf->getF2midiNote()*100-pf->getF1midiNote()*100;
         pitchdiff+=pf->getF2pitch();
         pitchdiff-=pf->getF1midiNote();
         pitchdiff*=xrel;
-        pitchdiff+=pf->getF1midiNote()*8192;
-        midinote=round(pitchdiff/8192);
-        pitch=pitchdiff-midinote*8192;
+        pitchdiff+=pf->getF1midiNote()*100;
+        midinote=round(static_cast<float>(pitchdiff)/100.0f);
+        pitch=pitchdiff-midinote*100;
+        //qDebug() << "BEND_HORIZ midinote " << midinote << " pitch " << pitch << " freq " << freq  << " bendVert " << bendVertTop << " " << bendVertBot << " pitchdiff " << pitchdiff;
         break;
 
     case BEND_VERT_HORIZ:
-        pitchdiff=pf->getF2midiNote()*100-pf->getF1midiNote()*8192;
+        pitchdiff=pf->getF2midiNote()*100-pf->getF1midiNote()*100;
         pitchdiff+=pf->getF2pitch();
         pitchdiff-=pf->getF1midiNote();
         pitchdiff*=xrel;
@@ -346,13 +347,14 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
         if(row!=es->row || col!=es->col) {
             Playfield * ppf = &_fields[es->row][es->col];
             ppf->decPressed();
-            _out->noteOff(es->voiceId);
 
             es->midinote=midinote;
-            es->voiceId=_out->noteOn(freq,midinote,pitch,velocity);
 
             es->row=row;
             es->col=col;
+
+            _out->pitch(es->voiceId,freq,midinote,pitch);
+
             es->f=freq;
             pf->incPressed();
         } else if(freq!=es->f) {

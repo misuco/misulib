@@ -58,6 +58,7 @@ private:
     int * ccstate;       // current ccval;
 
     void sendOsc(QString path, QVariant list);
+    void sendPitch(int pitch);
 };
 
 #endif // SENDERREAKTOR_H
