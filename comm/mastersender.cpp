@@ -67,9 +67,36 @@ void MasterSender::addSenderThread(QObject *s, QString name)
     t->setObjectName(name);
     t->start(QThread::TimeCriticalPriority);
     s->moveToThread(t);
+    connectSender(s);
+    mSenders.insert(name,s);
+}
+
+void MasterSender::connectSender(QObject * s) {
     connect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
     connect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
     connect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
     connect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
     connect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
+}
+
+void MasterSender::disconnectSender(QObject *s)
+{
+    disconnect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
+    disconnect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
+    disconnect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
+    disconnect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
+    disconnect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
+}
+
+void MasterSender::onToggleSender(QString id, bool value)
+{
+    QObject * sender = mSenders.value(id,nullptr);
+
+    if(sender) {
+        if(value == true) {
+            connectSender(sender);
+        } else {
+            disconnectSender(sender);
+        }
+    }
 }

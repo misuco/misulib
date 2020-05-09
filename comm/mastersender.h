@@ -38,6 +38,9 @@ public:
     void pitch(int voiceId, float f, int midinote, int pitch);
     void addSenderThread(QObject *s, QString name);
 
+public slots:
+    void onToggleSender(QString id, bool value);
+
 signals:
     void sigCc(int nextVoiceId, int cc, float v1, float v1avg);
     void sigPc(int v1);
@@ -46,8 +49,10 @@ signals:
     void sigPitch(int voiceId, float f, int midinote, int pitch);
 
 private:
-    QList<QObject *> senderThreads;
+    QMap<QString,QObject *> mSenders;
     int nextVoiceId;
+    void connectSender(QObject *s);
+    void disconnectSender(QObject *s);
 };
 
 #endif // SENDERMULTI_H

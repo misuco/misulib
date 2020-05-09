@@ -9,17 +9,17 @@ class ToggleSender : public ButtonBase
     Q_OBJECT
 
 public:
-    ToggleSender(QString text, int senderId, int state, QObject *parent = nullptr);
+    ToggleSender(QString text, QString senderId, int state, QObject *parent = nullptr);
 
 signals:
-    void toggleSender(int senderId, bool state);
+    void toggleSender(QString senderId, bool state);
 
 protected:
     void releaseAction() override;
     void setAction() override;
 
 private:
-    int _senderId;
+    QString _senderId;
 
 };
 
