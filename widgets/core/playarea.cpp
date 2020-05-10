@@ -30,7 +30,9 @@ PlayArea::PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QOb
     _touchHistory(touchhistory),
     _out(mastersender),
     _fcalc(0,this),
-    _sendCc1(false)
+    _sendCc1(false),
+    _cc1Sum(0),
+    _activeVoices(0)
 {
     bendHoriz=false;
     bendVertTop=0;
@@ -44,10 +46,7 @@ PlayArea::PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QOb
     }
 
     for(int i=0;i<EVENT_STACK_SIZE;i++) {
-        eventStack[i].eventId=-1;
-        eventStack[i].row=-1;
-        eventStack[i].col=-1;
-        eventStack[i].f=0;
+        eventStack[i].active=0;
     }
 
     for(int r=0;r<MAX_ROWS;r++) {
@@ -107,11 +106,11 @@ void PlayArea::config()
 
     // update touch points by "moving" them
     for(int i=0;i<EVENT_STACK_SIZE;i++) {
-        eventStackElement * es = &eventStack[i];
-        if(es->eventId>=0) {
+        EventStackElement * es = &eventStack[i];
+        if(es->active>0) {
             misuTouchEvent e;
             e.state=Qt::TouchPointMoved;
-            e.id=es->eventId;
+            e.touchId=es->touchId;
             e.x=es->x;
             e.y=es->y;
             processTouchEvent(e);
@@ -123,7 +122,7 @@ void PlayArea::setColumn(int col, int midinote, int pitch) {
     //qDebug() << "setColumn " << col << " midinote " << midinote << " rootNote " << rootNote;
     rows=0;
 
-    float huePerNote = 1.0/12.0;
+    float huePerNote = 1.0f/12.0f;
     if(bendVertTop!=0) {
         _fields[rows][col].setType(BEND_VERT);
         _fields[rows][col].setF1midiNote(midinote,pitch);
@@ -224,38 +223,49 @@ int PlayArea::getPlayFieldHeight()
     return _playFieldHeight;
 }
 
-void PlayArea::processTouchEvent(misuTouchEvent &e)
+void PlayArea::processTouchEvent(misuTouchEvent &touchEvent)
 {
     //qDebug() << "MWPlayArea::processPoint " << e.id << " x " << e.x << " y " << e.y << " state " << e.state;
 
-    if(e.id<0) {
+    if(touchEvent.touchId<0) {
         //qDebug() << "ignoring touch event with negative id " << e.id;
         return;
     }
 
     float hue=0;
-    int eventHash=e.id%EVENT_STACK_SIZE;
-    eventStackElement * es = &eventStack[eventHash];
-
-    es->x=e.x;
-    es->y=e.y;
+    int eventHash=touchEvent.touchId%EVENT_STACK_SIZE;
+    EventStackElement * eventStackElement = &eventStack[eventHash];
 
     // clip
-    if(e.x<0) e.x=0;
-    if(e.x>=_playAreaWidth) e.x=_playAreaWidth-1;
-    if(e.y<0) e.y=0;
-    if(e.y>=_playAreaHeight) e.y=_playAreaHeight-1;
+    if(touchEvent.x<0) touchEvent.x=0;
+    if(touchEvent.x>=_playAreaWidth) touchEvent.x=_playAreaWidth-1;
+    if(touchEvent.y<0) touchEvent.y=0;
+    if(touchEvent.y>=_playAreaHeight) touchEvent.y=_playAreaHeight-1;
 
     int row=0;
 
-    if(_playAreaHeight>0) row = e.y*rows/_playAreaHeight;
-    int col=e.x*cols/_playAreaWidth;
+    if(_playAreaHeight>0) row = touchEvent.y*rows/_playAreaHeight;
+    int col=touchEvent.x*cols/_playAreaWidth;
 
-    float yrel=(float)(e.y-row*rowheight[row])/(float)rowheight[row];
-    float xrel=(float)(e.x-col*colwidth[col])/(float)colwidth[col];
+    if(eventStackElement->active > 0 ) {
+        _cc1Sum -= eventStackElement->cc;
+    }
+
+    eventStackElement->yrel=(float)(touchEvent.y-row*rowheight[row])/(float)rowheight[row];
+    eventStackElement->xrel=(float)(touchEvent.x-col*colwidth[col])/(float)colwidth[col];
+
+    eventStackElement->x=touchEvent.x;
+    eventStackElement->y=touchEvent.y;
 
     Playfield * pf = &_fields[row][col];
     //qDebug() << "row " << row << " col " << col << " eventHash " << eventHash << " " << pf;
+
+    if(pf->getType() != BEND_VERT && pf->getType() != BEND_VERT_HORIZ ) {
+        eventStackElement->cc = 1.0f - eventStackElement->yrel;
+    } else {
+        eventStackElement->cc = eventStackElement->yrel;
+    }
+    _cc1Sum += eventStackElement->cc;
 
     float freq;
     int midinote;
@@ -269,11 +279,11 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
     switch(pf->getType()) {
     case BEND_HORIZ:
         freqdiff=pf->getF2freq()-pf->getF1freq();
-        freqdiff*=xrel;
+        freqdiff*=eventStackElement->xrel;
         freq=pf->getF1freq()+freqdiff;
 
         huediff = pf->getF2Hue()-pf->getF1Hue();
-        huediff*=xrel;
+        huediff*=eventStackElement->xrel;
         hue = pf->getF1Hue()+huediff;
         if(hue>1) hue-=1;
         if(hue<0) hue+=1;
@@ -281,7 +291,7 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
         pitchdiff=pf->getF2midiNote()*100-pf->getF1midiNote()*100;
         pitchdiff+=pf->getF2pitch();
         pitchdiff-=pf->getF1midiNote();
-        pitchdiff*=xrel;
+        pitchdiff*=eventStackElement->xrel;
         pitchdiff+=pf->getF1midiNote()*100;
         midinote=round(static_cast<float>(pitchdiff)/100.0f);
         pitch=pitchdiff-midinote*100;
@@ -292,15 +302,14 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
         pitchdiff=pf->getF2midiNote()*100-pf->getF1midiNote()*100;
         pitchdiff+=pf->getF2pitch();
         pitchdiff-=pf->getF1midiNote();
-        pitchdiff*=xrel;
+        pitchdiff*=eventStackElement->xrel;
         pitchdiff+=pf->getF1midiNote()*100;
         if(0==row) {
-            pitchdiff+=bendVertTop*100*(1-yrel);
+            pitchdiff+=bendVertTop*100*(1-eventStackElement->yrel);
         } else {
-            pitchdiff+=bendVertBot*100*yrel;
+            pitchdiff+=bendVertBot*100*eventStackElement->yrel;
         }
         midinote=round(pitchdiff/100);
-        //pcalc.setPitch(pitchdiff-midinote*100);
         _fcalc.setMidinote(midinote,pitchdiff-midinote*100);
         freq=_fcalc.getFreq();
         hue=_fcalc.getHue();
@@ -309,15 +318,13 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
     case BEND_VERT:
         if(0==row) {
             pitchdiff=bendVertTop*100;
-            yrel=1-yrel;
         } else {
             pitchdiff=bendVertBot*100;
         }
-        pitchdiff*=yrel;
+        pitchdiff*=1-eventStackElement->yrel;
         pitchdiff+=pf->getF1midiNote()*100;
         midinote=round(pitchdiff/100);
         pitch = pitchdiff-midinote*100;
-        //pcalc.setPitch(pitch);
         _fcalc.setMidinote(midinote,pitch);
         freq=_fcalc.getFreq();
         hue=_fcalc.getHue();
@@ -332,60 +339,67 @@ void PlayArea::processTouchEvent(misuTouchEvent &e)
         break;
     }
 
-    switch(e.state) {
+    switch(touchEvent.state) {
     case Qt::TouchPointPressed:
-        es->eventId=e.id;
-        es->midinote=midinote;
-        es->row=row;
-        es->col=col;
-        es->f=freq;
-        es->voiceId=_out->noteOn(freq,midinote,pitch,velocity);
+        eventStackElement->touchId=touchEvent.touchId;
+        eventStackElement->midinote=midinote;
+        eventStackElement->row=row;
+        eventStackElement->col=col;
+        eventStackElement->f=freq;
+        eventStackElement->voiceId=_out->noteOn(freq,midinote,pitch,velocity);
+        eventStackElement->active=1;
         pf->incPressed();
+        _activeVoices++;
         break;
 
     case Qt::TouchPointMoved:
-        if(row!=es->row || col!=es->col) {
-            Playfield * ppf = &_fields[es->row][es->col];
+        if(row!=eventStackElement->row || col!=eventStackElement->col) {
+            Playfield * ppf = &_fields[eventStackElement->row][eventStackElement->col];
             ppf->decPressed();
 
-            es->midinote=midinote;
+            eventStackElement->midinote=midinote;
 
-            es->row=row;
-            es->col=col;
+            eventStackElement->row=row;
+            eventStackElement->col=col;
 
-            _out->pitch(es->voiceId,freq,midinote,pitch);
+            _out->pitch(eventStackElement->voiceId,freq,midinote,pitch);
 
-            es->f=freq;
+            eventStackElement->f=freq;
             pf->incPressed();
-        } else if(freq!=es->f) {
-            _out->pitch(es->voiceId,freq,midinote,pitch);
-            es->f=freq;
+        } else if(freq!=eventStackElement->f) {
+            _out->pitch(eventStackElement->voiceId,freq,midinote,pitch);
+            eventStackElement->f=freq;
         }
 
-        if(_sendCc1) {
-            _out->cc(es->voiceId,1,1.0f-yrel,1.0f-yrel);
-        }
         break;
 
     case Qt::TouchPointReleased:
 
-        if(row!=es->row || col!=es->col) {
-            Playfield * ppf = &_fields[es->row][es->col];
+        if(row!=eventStackElement->row || col!=eventStackElement->col) {
+            Playfield * ppf = &_fields[eventStackElement->row][eventStackElement->col];
             if(ppf->getPressed()>0) ppf->decPressed();
         } else {
             if(pf->getPressed()>0) pf->decPressed();
         }
 
-        _out->noteOff(es->voiceId);
+        _cc1Sum -= eventStackElement->cc;
+        _out->noteOff(eventStackElement->voiceId);
 
-        es->eventId=-1;
-        es->row=-1;
-        es->col=-1;
+        eventStackElement->active=0;
+
+        _activeVoices--;
+        if(_activeVoices == 0) {
+            _cc1Sum = 0;
+        }
         break;
     }
     pf->calcColor();
 
-    if(_touchHistory) _touchHistory->insert(e.x,e.y,hue);
+    if(_sendCc1 && _activeVoices > 0) {
+        _out->cc(eventStackElement->voiceId,1,1.0f-eventStackElement->yrel,_cc1Sum/_activeVoices);
+    }
+
+    if(_touchHistory) _touchHistory->insert(touchEvent.x,touchEvent.y,hue);
 }
 
 void PlayArea::onSetRootNote(int p)
@@ -488,7 +502,7 @@ void PlayArea::onPressed(int id, int x, int y)
 {
     //qDebug() << "MWPlayArea::onPressed id: " << id << " x: " << x << " y: " << y;
     misuTouchEvent e;
-    e.id=id;
+    e.touchId=id;
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointPressed;
@@ -499,7 +513,7 @@ void PlayArea::onUpdated(int id, int x, int y)
 {
     //qDebug() << "MWPlayArea::onUpdated id: " << id << " x: " << x << " y: " << y;
     misuTouchEvent e;
-    e.id=id;
+    e.touchId=id;
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointMoved;
@@ -510,7 +524,7 @@ void PlayArea::onReleased(int id, int x, int y)
 {
     //qDebug() << "MWPlayArea::onReleased id: " << id << " x: " << x << " y: " << y;
     misuTouchEvent e;
-    e.id=id;
+    e.touchId=id;
     e.x=x;
     e.y=y;
     e.state=Qt::TouchPointReleased;

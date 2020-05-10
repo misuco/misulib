@@ -41,14 +41,18 @@ class PlayArea : public QObject
     Q_PROPERTY(QList<QObject *> row2 READ row2 NOTIFY playRowsChanged)
 
 public:
-    struct eventStackElement {
-        int eventId;
+    struct EventStackElement {
+        int active;
+        int touchId;
         int voiceId;
         int midinote;
         int row;
         int col;
         int x;
         int y;
+        float xrel;
+        float yrel;
+        float cc;
         float f;
     };
 
@@ -122,7 +126,7 @@ private:
     int cols;
 
     // - event stack/hashmap
-    eventStackElement eventStack[EVENT_STACK_SIZE];
+    EventStackElement eventStack[EVENT_STACK_SIZE];
 
     // CONFIGURATION
     // - bending
@@ -144,6 +148,10 @@ private:
     QList<QObject *> row0();
     QList<QObject *> row1();
     QList<QObject *> row2();
+
+    // cc1 average
+    float _cc1Sum;
+    int _activeVoices;
 
 };
 

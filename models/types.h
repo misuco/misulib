@@ -50,7 +50,7 @@ struct MWSound {
 };
 
 struct misuTouchEvent {
-    int id;
+    int touchId;
     int x;
     int y;
     int state;

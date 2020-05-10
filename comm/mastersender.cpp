@@ -44,7 +44,8 @@ void MasterSender::pc(int v1)
 
 int MasterSender::noteOn(float f, int midinote, int pitch, int v)
 {
-    int vid=nextVoiceId++;
+    int vid=nextVoiceId;
+    nextVoiceId++;
     if(nextVoiceId>1023)  nextVoiceId=1;
     emit sigNoteOn(vid,f,midinote,pitch,v);
     return vid;
