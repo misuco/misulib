@@ -42,18 +42,14 @@ SenderOscMidiGeneric::~SenderOscMidiGeneric()
 
 void SenderOscMidiGeneric::noteOn(int voiceId, float, int midinote, int pitch, int val)
 {
+    sendPitch(pitch);
+
     QVariantList v;
     v.append(midinote);
-    v.append(val);
+    v.append(127);
     v.append(_channel);
     QString path;
     path.sprintf("/note/%d",_channel);
-    sendOsc(path,v);
-
-    v.clear();
-    v.append(pitch);
-    v.append(_channel);
-    path.sprintf("/pitch/%d",_channel);
     sendOsc(path,v);
 
     notestate[voiceId%1024] = midinote;
@@ -70,15 +66,17 @@ void SenderOscMidiGeneric::noteOff(int voiceId)
     sendOsc(path,v);
 }
 
-void SenderOscMidiGeneric::pitch(int, float, int, int pitch)
+
+void SenderOscMidiGeneric::pitch(int voiceId, float freq, int midinote, int pitch)
 {
-    //qDebug() << "SenderOscMidiGeneric::pitch " << chan << " " << voiceId << " " << midinote << " " << pitch;
-    QVariantList v;
-    QString path;
-    v.append(pitch);
-    v.append(_channel);
-    path.sprintf("/pitch/%d",_channel);
-    sendOsc(path,v);
+    //qDebug() << " SenderReaktor::pitch " << voiceId << " " << midinote << " " << pitch ;
+
+    if(notestate[voiceId%1024]!=midinote) {
+        noteOff(voiceId);
+        noteOn(voiceId, freq, midinote, pitch, 127);
+    } else {
+        sendPitch(pitch);
+    }
 }
 
 void SenderOscMidiGeneric::setDestination(char * a, int p)
@@ -137,3 +135,21 @@ void SenderOscMidiGeneric::sendOsc(QString path, QVariant list)
     //qDebug() << " sendOsc to " << path << " values " << list;
     oscout->sendData(path,list);
 }
+
+
+void SenderOscMidiGeneric::sendPitch(int pitch)
+{
+    QVariantList v;
+    QString path;
+
+    // misuco pitch is in cent (100 per semitone)
+    // midi pitch is 4096 per semitone
+    // assuming that the whole 14 bit pitchbend range
+    // covers +-2 semitones (according to general midi specs)
+
+    int midiPitch = pitch * 4096 / 100;
+    v.append(midiPitch);
+    path.sprintf("/pitch/%d",_channel);
+    sendOsc(path,v);
+}
+
