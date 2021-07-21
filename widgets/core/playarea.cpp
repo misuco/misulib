@@ -318,10 +318,11 @@ void PlayArea::processTouchEvent(misuTouchEvent &touchEvent)
     case BEND_VERT:
         if(0==row) {
             pitchdiff=bendVertTop*100;
+            pitchdiff*=1-eventStackElement->yrel;
         } else {
             pitchdiff=bendVertBot*100;
+            pitchdiff*=eventStackElement->yrel;
         }
-        pitchdiff*=1-eventStackElement->yrel;
         pitchdiff+=pf->getF1midiNote()*100;
         midinote=round(pitchdiff/100);
         pitch = pitchdiff-midinote*100;
