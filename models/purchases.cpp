@@ -1,3 +1,5 @@
+/*
+
 #include <QDebug>
 #include "purchases.h"
 
@@ -49,7 +51,7 @@ void Purchases::onTransactionReady(QInAppTransaction *transaction)
             else
                 transaction->finalize();
         }
-        */
+
     } else if (transaction->status() == QInAppTransaction::PurchaseFailed) {
         qDebug() << "Purchase not completed.";
         //transaction->finalize();
@@ -57,3 +59,4 @@ void Purchases::onTransactionReady(QInAppTransaction *transaction)
     transaction->finalize();
 }
 
+*/

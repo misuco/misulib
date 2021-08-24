@@ -40,11 +40,13 @@ void PresetCollection::overwritePreset()
 
 void PresetCollection::buyPresetManager()
 {
+    /*
     qDebug() << "wlayout::buyPresetManager";
     if(Purchases::productPresetManager) {
         qDebug() << "_productPresetManager->purchase";
         Purchases::productPresetManager->purchase();
     }
+    */
 }
 
 void PresetCollection::importSong()
