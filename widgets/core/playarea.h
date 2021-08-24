@@ -23,11 +23,12 @@
 
 #include "lib/misulib/models/types.h"
 #include "lib/misulib/comm/mastersender.h"
+#include "lib/misulib/widgets/core/touchhistory.h"
 #include "lib/misulib/models/playfield.h"
 
-#define MAX_COLS 255
-#define MAX_ROWS 3
-#define EVENT_STACK_SIZE 64
+const int MAX_COLS=255;
+const int MAX_ROWS=3;
+const int EVENT_STACK_SIZE=64;
 
 class PlayArea : public QObject
 {
@@ -40,20 +41,24 @@ class PlayArea : public QObject
     Q_PROPERTY(QList<QObject *> row2 READ row2 NOTIFY playRowsChanged)
 
 public:
-    struct eventStackElement {
-        int eventId;
+    struct EventStackElement {
+        int active;
+        int touchId;
         int voiceId;
         int midinote;
         int row;
         int col;
         int x;
         int y;
+        float xrel;
+        float yrel;
+        float cc;
         float f;
     };
 
-    PlayArea(MasterSender * ms, QObject *parent);
+    PlayArea(MasterSender * mastersender, TouchHistory * touchhistory, QObject *parent);
     ~PlayArea();
-    virtual void processTouchEvent(misuTouchEvent e);
+    virtual void processTouchEvent(misuTouchEvent &e);
 
     Q_INVOKABLE void resize(int w, int h);
     Q_INVOKABLE void onPressed(int id, int x, int y);
@@ -91,6 +96,7 @@ signals:
 
 private:
     // INFRASTRUCTURE
+    TouchHistory * _touchHistory;
 
     // - scale model
     int _baseOct;
@@ -108,17 +114,19 @@ private:
     int _playFieldHeight;
 
     // - networking
-    MasterSender * out;
+    MasterSender * _out;
+
     // - processing
-    FreqTriple fcalc;
+    FreqTriple _fcalc;
 
     // WORKING MEMORY
     // - touch field configuration
-    Playfield fields[MAX_ROWS][MAX_COLS];
+    Playfield _fields[MAX_ROWS][MAX_COLS];
     int rows;
     int cols;
+
     // - event stack/hashmap
-    eventStackElement eventStack[EVENT_STACK_SIZE];
+    EventStackElement eventStack[EVENT_STACK_SIZE];
 
     // CONFIGURATION
     // - bending
@@ -140,6 +148,10 @@ private:
     QList<QObject *> row0();
     QList<QObject *> row1();
     QList<QObject *> row2();
+
+    // cc1 average
+    float _cc1Sum;
+    int _activeVoices;
 
 };
 

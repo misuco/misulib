@@ -23,10 +23,11 @@
 #include <QObject>
 #include <QList>
 #include "lib/misulib/comm/libofqf/qoscclient.h"
-#include "isender.h"
 
 class MasterSender : public QObject
 {
+    Q_OBJECT
+
 public:
     explicit MasterSender(QObject * parent = nullptr);
     ~MasterSender();
@@ -35,25 +36,23 @@ public:
     int noteOn(float f, int midinote, int pitch, int v);
     void noteOff(int voiceId);
     void pitch(int voiceId, float f, int midinote, int pitch);
-
-    void setDestination(char * a,int p);
-    void reconnect();
-
-    void setDestination(int i, char * a,int p);
-    void addSender(ISender * s);
+    void addSenderThread(QObject *s, QString name);
 
 public slots:
-    void onToggleSender(int i, bool value);
+    void onToggleSender(QString id, bool value);
+
+signals:
+    void sigCc(int nextVoiceId, int cc, float v1, float v1avg);
+    void sigPc(int v1);
+    int sigNoteOn(int vid, float f, int midinote, int pitch, int v);
+    void sigNoteOff(int voiceId);
+    void sigPitch(int voiceId, float f, int midinote, int pitch);
 
 private:
-    QList<ISender *> senders;
-    QList<bool> senderEnabled;
-
+    QMap<QString,QObject *> mSenders;
     int nextVoiceId;
-
-    bool midiOn[256];
-    quint8 * notestate;   // currently played notes
-    int onCnt;
+    void connectSender(QObject *s);
+    void disconnectSender(QObject *s);
 };
 
 #endif // SENDERMULTI_H

@@ -20,24 +20,30 @@
 #ifndef SENDEROSCMIDIGENERIC_H
 #define SENDEROSCMIDIGENERIC_H
 
-#include "isender.h"
+#include <QObject>
 #include "lib/misulib/comm/libofqf/qoscclientinterface.h"
 
-class SenderOscMidiGeneric : public ISender
+class SenderOscMidiGeneric : public QObject
 {
+
+Q_OBJECT
+
 public:
-    SenderOscMidiGeneric();
+    explicit SenderOscMidiGeneric(QObject * parent = nullptr);
     ~SenderOscMidiGeneric();
-    virtual void cc(int voiceId, int cc, float, float v1avg);
-    virtual void pc(int v1);
-    virtual void noteOn(int voiceId, float f, int midinote, int pitch, int val);
-    virtual void noteOff(int voiceId);
-    virtual void pitch(int voiceId, float f, int midinote, int pitch);
-    virtual void setDestination(char * a,int p);
-    virtual void reconnect();
-    virtual int getPort() {return port;}
-    virtual char* getAddress() {return adr;}
+
+    void setDestination(char * a,int p);
+    void reconnect();
+    int getPort() {return port;}
+    char* getAddress() {return adr;}
     void setChannel(int c);
+
+public slots:
+    void cc(int voiceId, int cc, float v1, float v1avg);
+    void pc(int v1);
+    void noteOn(int voiceId, float f, int midinote, int pitch, int v);
+    void noteOff(int voiceId);
+    void pitch(int voiceId, float f, int, int);
 
 private:
     QOscClientInterface* oscout;
@@ -49,6 +55,7 @@ private:
     int * notestate;    // currently played notes
     int * ccstate;      // current ccval;
     void sendOsc(QString path, QVariant list);
+    void sendPitch(int pitch);
 };
 
 #endif // SENDEROSCMIDIGENERIC_H

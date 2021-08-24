@@ -40,23 +40,13 @@ QOscServer::~QOscServer() {
         //qDebug() << "QOscServer::~QOscServer()";
 }
 
-void QOscServer::registerPathObject( PathObject* p ) {
-//        qDebug() << "QOscServer::registerPathObject(" << p->_path << ")";
-        paths.push_back( p );
-}
-void QOscServer::unregisterPathObject( PathObject* p ) {
-	paths.removeAll( p );
-}
-
-#define BUFFERSIZE 4096
-
 void QOscServer::readyRead() {
-    QHostAddress * src_adr = new QHostAddress;
-    quint16 * src_port = new quint16;
+    QHostAddress src_adr;
+    quint16 src_port;
 
     while ( socket()->hasPendingDatagrams() ) {
             QByteArray data( BUFFERSIZE, char( 0 ) );
-            int size = socket()->readDatagram( data.data(), BUFFERSIZE, src_adr, src_port );
+            int size = socket()->readDatagram( data.data(), BUFFERSIZE, &src_adr, &src_port );
             //qDebug() << " read" << size << "(" << data.size() << ") bytes:" << data;
 
             int i=0;
@@ -126,11 +116,8 @@ void QOscServer::readyRead() {
                     }
                 }
                 if(decodeState>4 && carg==nargs) {
-                    foreach( PathObject* obj, paths ) {
-                        obj->signalData( path, list, src_adr, *src_port );
-                    }
 
-                    emit oscData(path,list);
+                    emit oscData( path, list, src_adr, src_port );
 
                     decodeState=0;
                     list.clear();

@@ -18,21 +18,12 @@
  */
 
 #include "mastersender.h"
+#include "senderthread.h"
+#include "sendermobilesynth.h"
 
 MasterSender::MasterSender(QObject *parent) : QObject(parent)
 {
     nextVoiceId=1;
-
-    onCnt=0;
-    for(int i=0;i<256;i++) {
-        midiOn[i]=false;
-    }
-
-    notestate=new quint8[1024];
-
-    for(int i=0;i<1024;i++) {
-        notestate[i]=0;
-    }
 
 }
 
@@ -43,90 +34,70 @@ MasterSender::~MasterSender()
 void MasterSender::cc(int voiceId, int cc, float v1, float v1avg)
 {
     //qDebug() << "SenderMulti::cc(" << chan << "," << voiceId << "," << cc << "," << v1 << "," << v1avg << ")";
-    for(int i=0;i<senders.count();i++) {
-        if(senderEnabled[i]) senders.at(i)->cc(voiceId,cc,v1,v1avg);
-    }
+    emit sigCc(voiceId,cc,v1,v1avg);
 }
 
 void MasterSender::pc(int v1)
 {
-    for(int i=0;i<senders.count();i++) {
-        if(senderEnabled[i]) senders.at(i)->pc(v1);
-    }
+    emit sigPc(v1);
 }
 
 int MasterSender::noteOn(float f, int midinote, int pitch, int v)
 {
-    int vid=nextVoiceId++;
+    int vid=nextVoiceId;
+    nextVoiceId++;
     if(nextVoiceId>1023)  nextVoiceId=1;
-    for(int i=0;i<senders.count();i++) {
-        if(senderEnabled[i]) {
-            senders.at(i)->noteOn(vid,f,midinote,pitch,v);
-            //qDebug() << "SenderMulti::noteOn(sender:" << i << ",chan:" << chan << ",vid:" << vid << ",f:" << f << ",midinote:" << midinote << "," << pitch << "," << v << ")";
-        }
-    }
-    onCnt++;
-
+    emit sigNoteOn(vid,f,midinote,pitch,v);
     return vid;
 }
 
 void MasterSender::noteOff(int voiceId)
 {
-    for(int i=0;i<senders.count();i++) {
-        if(senderEnabled[i]) {
-            senders.at(i)->noteOff(voiceId);
-            //qDebug() << "SenderMulti::noteOff(" <<  voiceId  << ")";
-        }
-    }
-    onCnt--;
+    emit sigNoteOff(voiceId);
 }
 
 void MasterSender::pitch(int voiceId, float f, int midinote, int pitch)
 {
     //qDebug() << "SenderMulti::pitch(" << chan << "," << voiceId << "," << f << "," << midinote << "," << pitch << ")";
-    for(int i=0;i<senders.count();i++) {
-        if(senderEnabled[i]) senders.at(i)->pitch(voiceId,f,midinote,pitch);
-    }
+    emit sigPitch(voiceId,f,midinote,pitch);
 }
 
-void MasterSender::setDestination(char * a, int p)
+void MasterSender::addSenderThread(QObject *s, QString name)
 {
-    for(int i=0;i<senders.count();i++) {
-        senders.at(i)->setDestination(a,p);
-    }
+    QThread * t = new SenderThread();
+    t->setObjectName(name);
+    t->start(QThread::TimeCriticalPriority);
+    s->moveToThread(t);
+    connectSender(s);
+    mSenders.insert(name,s);
 }
 
-void MasterSender::setDestination(int i, char * a,int p) {
-    if(i<senders.count()) {
-        senders.at(i)->setDestination(a,p);
-    }
+void MasterSender::connectSender(QObject * s) {
+    connect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
+    connect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
+    connect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
+    connect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
+    connect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
 }
 
-void MasterSender::addSender(ISender *s)
+void MasterSender::disconnectSender(QObject *s)
 {
-    senders.append(s);
-    senderEnabled.append(true);
+    disconnect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
+    disconnect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
+    disconnect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
+    disconnect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
+    disconnect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
 }
 
-void MasterSender::onToggleSender(int i, bool value)
+void MasterSender::onToggleSender(QString id, bool value)
 {
-    if(i<senderEnabled.size()) {
-        senderEnabled[i] = value;
-    }
-}
+    QObject * sender = mSenders.value(id,nullptr);
 
-/*
-bool MasterSender::isSenderEnabled(int i)
-{
-    if(i<senderEnabled.size()) {
-        return senderEnabled.at(i);
-    } else return false;
-}
-*/
-
-void MasterSender::reconnect() {
-    for(int i=0;i<senders.count();i++) {
-        senders.at(i)->reconnect();
-        //qDebug() << "reconnect " << i;
+    if(sender) {
+        if(value == true) {
+            connectSender(sender);
+        } else {
+            disconnectSender(sender);
+        }
     }
 }

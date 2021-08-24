@@ -32,12 +32,14 @@ class MWScalePreset : public QObject
     Q_PROPERTY(QStringList Scale READ scale NOTIFY presetChanged)
     Q_PROPERTY(int ScaleSize MEMBER _scaleSize NOTIFY presetChanged)
     Q_PROPERTY(bool selected READ isSelected NOTIFY selectedChanged)
+    Q_PROPERTY(QString text MEMBER _text NOTIFY presetChanged)
 
 public:
     MWScalePreset(QObject *parent);
-    MWScalePreset(int rootNote, QList<bool> scale, QObject *parent);
+    MWScalePreset(int rootNote, QList<bool> scale, QString text="", QObject *parent=nullptr);
 
     QStringList scale();
+    QString getText();
     int getRootNote();
     bool getScale(int i);
 
@@ -68,6 +70,7 @@ private:
 
     int _presetRootNote;
     QList<bool> _presetScale;
+    QString _text;
 
     int _pressed;
     int _scaleSize;

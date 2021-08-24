@@ -32,6 +32,11 @@ Item {
                 }
             }
 
+            Text {
+                anchors.fill: parent
+                text: modelData.text
+            }
+
             Rectangle {
                 color: "Transparent"
                 width: cellWidth
@@ -47,8 +52,7 @@ Item {
                     onCanceled: modelData.onCanceled()
                     onReleased: modelData.onReleased()
                 }
-
-            }
+            }            
         }
     }
 }

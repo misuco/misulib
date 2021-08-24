@@ -20,39 +20,45 @@
 #ifndef SENDERREAKTOR_H
 #define SENDERREAKTOR_H
 
-#include "isender.h"
+#include <QObject>
 #include "lib/misulib/comm/libofqf/qoscclientinterface.h"
 
-class SenderReaktor : public ISender
+class SenderReaktor : public QObject
 {
+    Q_OBJECT
+
 public:
-    SenderReaktor();
+    explicit SenderReaktor(QObject * parent = nullptr);
     ~SenderReaktor();
-    virtual void cc(int voiceId, int cc, float, float v1avg);
-    virtual void pc(int v1);
-    virtual int noteOn(float f, int midinote, int pitch, int v);
-    virtual void noteOn(int voiceId, float f, int midinote, int pitch, int vel);
-    virtual void noteOff(int voiceId);
-    virtual void pitch(int voiceId, float f, int midinote, int pitch);
-    virtual void setDestination(char * a,int p);
-    virtual void reconnect();
-    virtual int getPort() {return port;}
-    virtual char* getAddress() {return adr;}
+
+    void setDestination(char * a, int p);
+    void reconnect();
+    int getPort() {return port;}
+    char* getAddress() {return adr;}
 
     void setChannel(int c);
+
+public slots:
+    void cc(int voiceId, int cc, float v1, float v1avg);
+    void pc(int v1);
+    void noteOn(int voiceId, float f, int midinote, int pitch, int v);
+    void noteOff(int voiceId);
+    void pitch(int voiceId, float f, int, int);
 
 private:
     QOscClientInterface* oscout;
     char * adr;
-    int port;
+    quint16 port;
     int _channel;
 
     int prog;              // current program
-    quint8 * notestate;   // currently played notes
-    quint8 * notechan;    // currently played notes chan
+    int * notestate;   // currently played notes
+    int * notechan;    // currently played notes chan
+    int * notevel;    // currently played notes velocity
     int * ccstate;       // current ccval;
 
     void sendOsc(QString path, QVariant list);
+    void sendPitch(int pitch);
 };
 
 #endif // SENDERREAKTOR_H

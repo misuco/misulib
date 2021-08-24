@@ -40,16 +40,33 @@ void PresetCollection::overwritePreset()
 
 void PresetCollection::buyPresetManager()
 {
+    /*
     qDebug() << "wlayout::buyPresetManager";
     if(Purchases::productPresetManager) {
         qDebug() << "_productPresetManager->purchase";
         Purchases::productPresetManager->purchase();
     }
+    */
+}
+
+void PresetCollection::importSong()
+{
+    dialogVisible=false;
+    emit layoutChange();
+    emit showImportSong();
 }
 
 void PresetCollection::append(QObject *item)
 {
     _items.append(item);
+    emit itemsChange();
+}
+
+void PresetCollection::clear()
+{
+    for(auto item:_items) item->deleteLater();
+    _items.clear();
+    emit itemsChange();
 }
 
 QList<QObject *> PresetCollection::getItems()

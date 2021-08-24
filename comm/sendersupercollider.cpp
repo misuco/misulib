@@ -21,7 +21,7 @@
 #include "sendersupercollider.h"
 #include "../comm/libofqf/qoscclient.h"
 
-SenderSuperCollider::SenderSuperCollider()
+SenderSuperCollider::SenderSuperCollider(QObject *parent) : QObject(parent)
 {
     adr=new char[16];
     sy="m0";
@@ -66,11 +66,6 @@ void SenderSuperCollider::reconnect()
     delete(oscout);
     oscout=new QOscClient();
     oscout->setAddress(adr,port);
-}
-
-int SenderSuperCollider::noteOn(float, int, int, int)
-{
-    return 0;
 }
 
 void SenderSuperCollider::noteOn(int voiceId, float f, int, int, int vel)

@@ -19,19 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "senderreaktor.h"
 #include "lib/misulib/comm/libofqf/qoscclient.h"
 
-SenderReaktor::SenderReaktor()
+SenderReaktor::SenderReaktor(QObject *parent) : QObject(parent)
 {
     adr=new char[16];
     strcpy(adr,"255.255.255.255");
     port=3150;
     oscout=new QOscClient();
     oscout->setAddress(adr,port);
-    notestate=new quint8[1024];
-    notechan=new quint8[1024];
+    notestate=new int[1024];
+    notechan=new int[1024];
+    notevel=new int[1024];
     ccstate=new int[1024];
     for(int i=0;i<1024;i++) {
         notestate[i]=0;
         notechan[i]=0;
+        notevel[i]=0;
         ccstate[i]=0;
     }
     prog=0;
@@ -43,29 +45,27 @@ SenderReaktor::~SenderReaktor()
     delete(oscout);
 }
 
-int SenderReaktor::noteOn(float, int, int, int)
-{
-    return 0;
-}
-
 void SenderReaktor::noteOn(int voiceId, float, int midinote, int pitch, int vel)
 {
+    //qDebug() << " SenderReaktor::noteOn " << voiceId << " " << midinote << " " << pitch ;
     QVariantList v;
     v.append(midinote);
     v.append(vel);
     QString path;
     path.sprintf("/note/%d",_channel);
     sendOsc(path,v);
-    v.clear();
-    v.append(pitch);
-    path.sprintf("/pitch/%d",_channel);
-    sendOsc(path,v);
+
+    sendPitch(pitch);
+
     notechan[voiceId%1024]=_channel;
     notestate[voiceId%1024]=midinote;
+    notevel[voiceId%1024]=vel;
 }
 
 void SenderReaktor::noteOff(int voiceId)
 {
+    //qDebug() << " SenderReaktor::noteOff " << voiceId ;
+
     QVariantList v;
     QString path;
     v.append(notestate[voiceId%1024]);
@@ -74,14 +74,16 @@ void SenderReaktor::noteOff(int voiceId)
     sendOsc(path,v);
 }
 
-void SenderReaktor::pitch(int, float, int, int pitch)
+void SenderReaktor::pitch(int voiceId, float freq, int midinote, int pitch)
 {
-    QVariantList v;
-    QString path;
+    //qDebug() << " SenderReaktor::pitch " << voiceId << " " << midinote << " " << pitch ;
 
-    v.append(pitch*64);
-    path.sprintf("/pitch/%d",_channel);
-    sendOsc(path,v);
+    if(notestate[voiceId%1024]!=midinote) {
+        noteOff(voiceId);
+        noteOn(voiceId, freq, midinote, pitch, notevel[voiceId%1024]);
+    } else {
+        sendPitch(pitch);
+    }
 }
 
 void SenderReaktor::setDestination(char * a, int p)
@@ -90,7 +92,7 @@ void SenderReaktor::setDestination(char * a, int p)
     adr=new char[strlen(a)];
     strcpy(adr,a);
     port=p;
-    oscout->setAddress(adr,p);
+    oscout->setAddress(adr,port);
 }
 
 void SenderReaktor::reconnect()
@@ -116,10 +118,10 @@ void SenderReaktor::pc(int v1)
 
 void SenderReaktor::cc(int, int cc, float, float v1avg)
 {
-    //qDebug() <<  "SenderOscPuredata::cc " << cc << " v1 " << v1;
+    //qDebug() <<  "SenderOscPuredata::cc " << cc << " v1 " << v1avg;
 
     // translate value to midi
-    int v1mid=(float)127*v1avg;
+    int v1mid=qRound(127.0f*v1avg);
 
     // translate cc numbers
     if(v1mid!=ccstate[cc]) {
@@ -136,4 +138,18 @@ void SenderReaktor::sendOsc(QString path, QVariant list)
 {
     //qDebug() << " sendOsc to " << path << " values " << list;
     oscout->sendData(path,list);
+}
+
+void SenderReaktor::sendPitch(int pitch)
+{
+    QVariantList v;
+    QString path;
+
+    // misuco pitch is in cent (100 per semitone)
+    // reaktor pitch is 2048 per semitone
+
+    int reaktorRangePitch = pitch * 2048 / 100;
+    v.append(reaktorRangePitch);
+    path.sprintf("/pitch/%d",_channel);
+    sendOsc(path,v);
 }

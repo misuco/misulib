@@ -20,8 +20,8 @@
 #ifndef SENDERMOBILESYNTH_H
 #define SENDERMOBILESYNTH_H
 
+#include <QObject>
 #include <QtGlobal>
-#include "isender.h"
 #ifdef Q_OS_IOS
 #include "lib/mobilesynth/mobilesynthviewcontrollerrc1.hpp"
 #include "lib/mobilesynth/synth/controller.h"
@@ -29,20 +29,15 @@
 #include "lib/mobilesynth/mobilesynthqt52.h"
 #endif
 
-class SenderMobileSynth : public ISender
+class SenderMobileSynth : public QObject
 {
+    Q_OBJECT
+
 public:
-    SenderMobileSynth();
+    explicit SenderMobileSynth(QObject * parent = nullptr);
     ~SenderMobileSynth();
-    virtual void cc(int voiceId, int cc, float v1, float);
-    virtual void pc(int);
-    virtual void noteOn(int voiceId, float f, int midinote, int pitch, int v);
-    virtual void noteOff(int voiceId);
-    virtual void pitch(int voiceId, float f, int, int);
-    virtual void setDestination(char * a,int p);
-    virtual void reconnect() {}
-    virtual int getPort() {return 0;}
-    virtual char* getAddress() {return 0;}
+
+public:
     synth::Controller * getSynthController() {
 #ifdef Q_OS_IOS
         return sy;
@@ -50,6 +45,13 @@ public:
         return sy->getSyctl();
 #endif
     }
+
+public slots:
+    void cc(int voiceId, int cc, float v1, float);
+    void pc(int);
+    void noteOn(int voiceId, float f, int midinote, int pitch, int v);
+    void noteOff(int voiceId);
+    void pitch(int voiceId, float f, int, int);
     
 private:
 #ifdef Q_OS_IOS

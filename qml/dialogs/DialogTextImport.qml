@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.4
 
 Item {
     Rectangle {
@@ -17,8 +18,10 @@ Item {
             anchors.topMargin: portrait ? buttonSize * 2 : 0
             anchors.leftMargin: portrait ? 0 : buttonSize * 2
 
-            Text {
+            TextArea {
                 id: mainText
+                height: parent.height / 2
+
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -26,8 +29,7 @@ Item {
                 }
 
                 anchors.margins: buttonSize
-                text: "You have pressed and hold a preset button. Would you like to overwrite the preset with the current scale? "
-                color: fgColor
+                text: ""
                 font.pixelSize: fontSize1
                 wrapMode: Text.WordWrap
             }
@@ -48,7 +50,7 @@ Item {
 
                     Text {
                         anchors.fill: parent
-                        text: "Cancel"
+                        text: "import"
                         color: fgColor
                         font.pixelSize: fontSize2
                         horizontalAlignment: Qt.AlignHCenter
@@ -58,35 +60,11 @@ Item {
                     MultiPointTouchArea {
                         anchors.fill: parent
                         onPressed: {
-                            layout.scalePresets.closeDialogPreset();
+                            layout.songTextImport.importText(mainText.text);
                         }
                     }
                 }
 
-                Rectangle {
-                    width: portrait ? buttonSize*1.5 : buttonSize*2
-                    height: buttonSize
-                    radius: buttonRadius
-                    color: bgColor
-                    border.width: 1
-                    border.color: fgColor
-
-                    Text {
-                        anchors.fill: parent
-                        text: "Overwrite"
-                        color: fgColor
-                        font.pixelSize: fontSize2
-                        horizontalAlignment: Qt.AlignHCenter
-                        verticalAlignment: Qt.AlignVCenter
-                    }
-
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        onPressed: {
-                            layout.scalePresets.overwritePreset();
-                        }
-                    }
-                }
             }
         }
     }

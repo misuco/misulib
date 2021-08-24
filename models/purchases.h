@@ -1,6 +1,7 @@
 #ifndef PURCHASES_H
 #define PURCHASES_H
 
+/*
 #include <QObject>
 #include <QInAppStore>
 #include <QInAppTransaction>
@@ -25,5 +26,6 @@ private:
     QInAppStore *   _inAppStore;
 
 };
+*/
 
 #endif // PURCHASES_H

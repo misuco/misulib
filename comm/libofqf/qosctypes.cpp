@@ -131,64 +131,6 @@ QByteArray QOscBase::oscMessage( QString path, QVariant arg ) {
 	return out;
 }
 
-/*
-PathObject::PathObject( QString path, QVariant::Type type, QOscClient* parent )
-	: QObject( parent )
-	, _path( path )
-	, _type( type )
-	, _client( parent )
-	, _server( 0 )
-{
-}
-PathObject::PathObject( QString path, QVariant::Type type, QOscServer* parent )
-        : QObject( parent )
-        , _path( path )
-        , _type( type )
-        , _client( 0 )
-        , _server( parent )
-{
-        _server->registerPathObject( this );
-}
-PathObject::PathObject( QString path, QVariant::Type type, QOscServerInterface* parent )
-        : QObject( 0 )
-        , _path( path )
-        , _type( type )
-        , _client( 0 )
-        , _server( parent )
-{
-        _server->registerPathObject( this );
-}
-PathObject::~PathObject() {
-	if ( _server )
-		_server->unregisterPathObject( this );
-}
-
-void PathObject::send( QVariant v ) {
-	if ( v.type() == _type && _client )
-		_client->sendData( _path, v );
-}
-void PathObject::send( int i ) { send( QVariant( i ) ); }
-void PathObject::send( QString s ) { send( QVariant( s ) ); }
-void PathObject::send( float d ) { send( QVariant( d ) ); }
-void PathObject::send() { send( QVariant() ); }
-
-void PathObject::signalData( QVariant v ) {
-
-   //qDebug() << "signalData" << v.type();
-    if ( v.type() == _type ) {
-        if ( _type == QVariant::Invalid )
-                emit data();
-        if ( _type == QVariant::Int )
-                emit data( v.toInt() );
-        if ( _type == QVariant::float )
-                emit data( v.tofloat() );
-        if ( _type == QVariant::String )
-                emit data( v.toString() );
-        emit data( v );
-    }
-}
-*/
-
 unsigned long long QOscBase::getTimeTag()
 {
     const unsigned long long EPOCH = 2208988800ULL;

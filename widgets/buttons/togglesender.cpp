@@ -1,6 +1,6 @@
 #include "togglesender.h"
 
-ToggleSender::ToggleSender(QString text, int senderId, int state, QObject * parent) : ButtonBase(text,state,parent),
+ToggleSender::ToggleSender(QString text, QString senderId, int state, QObject * parent) : ButtonBase(text,state,parent),
     _senderId(senderId)
 {}
 

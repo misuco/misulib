@@ -29,9 +29,6 @@ public:
      */
     void setAddress( char * adr, quint16 port );
 
-    void registerPathObject( PathObject* );
-    void unregisterPathObject( PathObject* );
-
     int state();
 
 signals:
@@ -51,7 +48,6 @@ private:
     quint16 _port;
     QTcpSocket * _tcp_socket;
     void setupTcpSocket();
-    QList<PathObject*> paths;
 
 };
 

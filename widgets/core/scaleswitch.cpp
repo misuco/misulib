@@ -19,7 +19,6 @@
  */
 
 #include "scaleswitch.h"
-#include "lib/misulib/comm/senderdebug.h"
 #include "lib/misulib/models/types.h"
 #include <QDebug>
 
