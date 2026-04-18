@@ -22,12 +22,7 @@
 
 #include <QObject>
 #include <QtGlobal>
-#ifdef Q_OS_IOS
-#include "lib/mobilesynth/mobilesynthviewcontrollerrc1.hpp"
-#include "lib/mobilesynth/synth/controller.h"
-#else
-#include "lib/mobilesynth/mobilesynthqt52.h"
-#endif
+#include "polymobilesynth/qt6/mobilesynth.h"
 
 class SenderMobileSynth : public QObject
 {
@@ -38,12 +33,8 @@ public:
     ~SenderMobileSynth();
 
 public:
-    synth::Controller * getSynthController() {
-#ifdef Q_OS_IOS
+    MobileSynth * getSynthController() {
         return sy;
-#else
-        return sy->getSyctl();
-#endif
     }
 
 public slots:
@@ -54,12 +45,7 @@ public slots:
     void pitch(int voiceId, float f, int, int);
     
 private:
-#ifdef Q_OS_IOS
-    mobilesynthview::Widget * syco;
-    synth::Controller * sy;
-#else
-    mobileSynthQT52 * sy;
-#endif
+    MobileSynth * sy;
 };
 
 #endif // SENDERMOBILESYNTH_H

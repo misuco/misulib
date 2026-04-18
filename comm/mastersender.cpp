@@ -19,7 +19,7 @@
 
 #include "mastersender.h"
 #include "senderthread.h"
-#include "sendermobilesynth.h"
+#include <QDebug>
 
 MasterSender::MasterSender(QObject *parent) : QObject(parent)
 {
@@ -33,7 +33,7 @@ MasterSender::~MasterSender()
 
 void MasterSender::cc(int voiceId, int cc, float v1, float v1avg)
 {
-    //qDebug() << "SenderMulti::cc(" << chan << "," << voiceId << "," << cc << "," << v1 << "," << v1avg << ")";
+    qDebug() << "MasterSender::cc( voiceId: " << voiceId << ", cc: " << cc << ", v1: " << v1 << ", v1avg: " << v1avg << ")";
     emit sigCc(voiceId,cc,v1,v1avg);
 }
 
@@ -44,6 +44,7 @@ void MasterSender::pc(int v1)
 
 int MasterSender::noteOn(float f, int midinote, int pitch, int v)
 {
+    qDebug() << "MasterSender::noteOn f: " << f << ", midinote: " << midinote << ", pitch: " << pitch << ", v: " << v << ")";
     int vid=nextVoiceId;
     nextVoiceId++;
     if(nextVoiceId>1023)  nextVoiceId=1;
@@ -53,26 +54,28 @@ int MasterSender::noteOn(float f, int midinote, int pitch, int v)
 
 void MasterSender::noteOff(int voiceId)
 {
+    qDebug() << "MasterSender::noteOff voiceId: " << voiceId << ")";
     emit sigNoteOff(voiceId);
 }
 
 void MasterSender::pitch(int voiceId, float f, int midinote, int pitch)
 {
-    //qDebug() << "SenderMulti::pitch(" << chan << "," << voiceId << "," << f << "," << midinote << "," << pitch << ")";
+    qDebug() << "MasterSender::pitch( voideId: " << voiceId << ", f: " << f << ", midinote: " << midinote << ", pitch: " << pitch << ")";
     emit sigPitch(voiceId,f,midinote,pitch);
 }
 
 void MasterSender::addSenderThread(QObject *s, QString name)
 {
+    qDebug() << "MasterSender::addSenderThread(" << name << "," << s << ")";
     QThread * t = new SenderThread();
     t->setObjectName(name);
     t->start(QThread::TimeCriticalPriority);
     s->moveToThread(t);
-    connectSender(s);
     mSenders.insert(name,s);
 }
 
 void MasterSender::connectSender(QObject * s) {
+    qDebug() << "MasterSender::connectSender " << s;
     connect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
     connect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
     connect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
@@ -82,6 +85,7 @@ void MasterSender::connectSender(QObject * s) {
 
 void MasterSender::disconnectSender(QObject *s)
 {
+    qDebug() << "MasterSender::disconnectSender " << s;
     disconnect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
     disconnect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
     disconnect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));

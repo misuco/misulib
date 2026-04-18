@@ -22,7 +22,7 @@
 
 #include <QObject>
 #include <QList>
-#include "lib/misulib/comm/libofqf/qoscclient.h"
+#include <QMap>
 
 class MasterSender : public QObject
 {

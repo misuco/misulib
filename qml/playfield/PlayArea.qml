@@ -18,36 +18,43 @@ Item {
         anchors.fill: parent
 
         onPressed: (touchPoints) => {
+            console.log("PlayArea.onPressed")
             for(var i=0;i<touchPoints.length;i++) {
+                console.log("PlayArea.controller.onPressed " + i)
                 controller.onPressed(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
         onTouchUpdated: (touchPoints) => {
+            console.log("PlayArea.onTouchUpdated")
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onUpdated(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
         onUpdated: (touchPoints) => {
+            console.log("PlayArea.onUpdated")
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onUpdated(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
         onCanceled: (touchPoints) => {
+            console.log("PlayArea.onCanceled")
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onReleased(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
         onReleased: (touchPoints) => {
+            console.log("PlayArea.onReleased")
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onReleased(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
         onGestureStarted: (gesture) => {
+            console.log("PlayArea.onGestureStarted")
             gesture.grab();
         }
     }

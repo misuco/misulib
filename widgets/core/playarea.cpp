@@ -501,7 +501,7 @@ void PlayArea::resize(int w, int h)
 
 void PlayArea::onPressed(int id, int x, int y)
 {
-    //qDebug() << "MWPlayArea::onPressed id: " << id << " x: " << x << " y: " << y;
+    qDebug() << "MWPlayArea::onPressed id: " << id << " x: " << x << " y: " << y;
     misuTouchEvent e;
     e.touchId=id;
     e.x=x;
