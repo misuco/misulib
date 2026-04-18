@@ -1,5 +1,4 @@
-import QtQuick 2.0
-import Qt5Compat.GraphicalEffects 2.0
+import QtQuick
 
 Item {
     Rectangle {
