@@ -192,13 +192,13 @@ void Playfield::calcText()
 {
     text1="";
     text2=f1.getRootNoteString(_noteSymbols);
-    if(type==0 && _noteSymbols>0) text3.sprintf("%d",f1.getOct());
+    if(type==0 && _noteSymbols>0) text3 = QString("%1").arg(f1.getOct());
     else text3="";
     if(_showFreqs) {
-        text1.sprintf("%4.1f",f1.getFreq());
+        text1 = QString("%1").arg(f1.getFreq(),4,'f',1,u'0');
         if(type==1 || type==2) {
-            text1.sprintf("%4.1f",f1.getFreq());
-            text3.sprintf("%4.1f",f2.getFreq());
+            text1 = QString("%1").arg(f1.getFreq(),4,'f',1,u'0');
+            text3 = QString("%1").arg(f2.getFreq(),4,'f',1,u'0');
         }
     }
     emit textChanged();

@@ -96,7 +96,7 @@ void MWFader::valueChange()
 void MWFader::calcGeo()
 {
     _faderY=((float)value-(float)minValue)/(float)valRange;
-    _text1.sprintf("%d",_valueDisplay);
+    _text1 = QString("%1").arg(_valueDisplay);
     emit geoChanged();
 }
 

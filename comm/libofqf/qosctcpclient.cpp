@@ -21,7 +21,7 @@
 #include "qosctcpclient.h"
 #include <QtCore/QByteArray>
 #include <QtNetwork/QTcpSocket>
-#include <QtCore/QRegExp>
+#include <QRegExp>
 
 QOscTcpClient::QOscTcpClient(QObject *parent) :
     QOscBase(parent,true)

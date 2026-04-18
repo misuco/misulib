@@ -17,37 +17,37 @@ Item {
     MultiPointTouchArea {
         anchors.fill: parent
 
-        onPressed: {
+        onPressed: (touchPoints) => {
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onPressed(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
-        onTouchUpdated: {
+        onTouchUpdated: (touchPoints) => {
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onUpdated(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
-        onUpdated: {
+        onUpdated: (touchPoints) => {
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onUpdated(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
-        onCanceled: {
+        onCanceled: (touchPoints) => {
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onReleased(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
-        onReleased: {
+        onReleased: (touchPoints) => {
             for(var i=0;i<touchPoints.length;i++) {
                 controller.onReleased(touchPoints[i].pointId,touchPoints[i].x,touchPoints[i].y)
             }
         }
 
-        onGestureStarted: {
+        onGestureStarted: (gesture) => {
             gesture.grab();
         }
     }

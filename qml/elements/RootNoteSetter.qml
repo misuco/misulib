@@ -44,19 +44,19 @@ Item {
             MultiPointTouchArea {
                 anchors.fill: parent
 
-                onPressed: {
+                onPressed: (touchPoints) => {
                     for(var i=0;i<touchPoints.length;i++) {
                         modelData.onPressed()
                     }
                 }
 
-                onCanceled: {
+                onCanceled: (touchPoints) => {
                     for(var i=0;i<touchPoints.length;i++) {
                         modelData.onReleased()
                     }
                 }
 
-                onReleased: {
+                onReleased: (touchPoints) => {
                     for(var i=0;i<touchPoints.length;i++) {
                         modelData.onReleased()
                     }

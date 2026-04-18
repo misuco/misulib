@@ -39,8 +39,7 @@ SenderSuperCollider::~SenderSuperCollider()
 void SenderSuperCollider::cc(int voiceId, int cc, float v1, float)
 {
     QVariantList v;
-    QString p;
-    p.sprintf("par%d",cc);
+    QString p = QString("par%1").arg(cc);
     v.append(voiceId);
     v.append(p);
     v.append(v1);
@@ -49,7 +48,7 @@ void SenderSuperCollider::cc(int voiceId, int cc, float v1, float)
 
 void SenderSuperCollider::pc(int v1)
 {
-    sy.sprintf("m%d",v1);
+    sy = QString("m%1").arg(v1);
 }
 
 void SenderSuperCollider::setDestination(char * a, int p)

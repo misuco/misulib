@@ -48,8 +48,7 @@ void SenderOscMidiGeneric::noteOn(int voiceId, float, int midinote, int pitch, i
     v.append(midinote);
     v.append(127);
     v.append(_channel);
-    QString path;
-    path.sprintf("/note/%d",_channel);
+    QString path = QString("/note/%1").arg(_channel);
     sendOsc(path,v);
 
     notestate[voiceId%1024] = midinote;
@@ -58,11 +57,10 @@ void SenderOscMidiGeneric::noteOn(int voiceId, float, int midinote, int pitch, i
 void SenderOscMidiGeneric::noteOff(int voiceId)
 {
     QVariantList v;
-    QString path;
     v.append(notestate[voiceId%1024]);
     v.append(0);
     v.append(_channel);
-    path.sprintf("/note/%d",_channel);
+    QString path = QString("/note/%1").arg(_channel);
     sendOsc(path,v);
 }
 
@@ -103,10 +101,9 @@ void SenderOscMidiGeneric::setChannel(int c)
 void SenderOscMidiGeneric::pc(int v1)
 {
     QVariantList v;
-    QString path;
     v.append(v1);
     v.append(_channel);
-    path.sprintf("/pc/%d",_channel);
+    QString path = QString("/pc/%1").arg(_channel);
     sendOsc(path,v);
 }
 
@@ -121,11 +118,10 @@ void SenderOscMidiGeneric::cc(int, int cc, float, float v1avg)
     if(v1mid!=ccstate[cc]) {
         ccstate[cc]=v1mid;
         QVariantList v;
-        QString path;
         v.append(v1mid);
         v.append(cc);
         v.append(_channel);
-        path.sprintf("/cc/%d/%d",_channel,cc);
+        QString path = QString("/cc/%1/%2").arg(_channel,cc);
         sendOsc(path,v);
     }
 }
@@ -140,7 +136,6 @@ void SenderOscMidiGeneric::sendOsc(QString path, QVariant list)
 void SenderOscMidiGeneric::sendPitch(int pitch)
 {
     QVariantList v;
-    QString path;
 
     // misuco pitch is in cent (100 per semitone)
     // midi pitch is 4096 per semitone
@@ -149,7 +144,7 @@ void SenderOscMidiGeneric::sendPitch(int pitch)
 
     int midiPitch = pitch * 4096 / 100;
     v.append(midiPitch);
-    path.sprintf("/pitch/%d",_channel);
+    QString path = QString("/pitch/%1").arg(_channel);
     sendOsc(path,v);
 }
 

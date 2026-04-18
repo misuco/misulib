@@ -51,8 +51,7 @@ void SenderReaktor::noteOn(int voiceId, float, int midinote, int pitch, int vel)
     QVariantList v;
     v.append(midinote);
     v.append(vel);
-    QString path;
-    path.sprintf("/note/%d",_channel);
+    QString path = QString("/note/%1").arg(_channel);
     sendOsc(path,v);
 
     sendPitch(pitch);
@@ -67,10 +66,9 @@ void SenderReaktor::noteOff(int voiceId)
     //qDebug() << " SenderReaktor::noteOff " << voiceId ;
 
     QVariantList v;
-    QString path;
     v.append(notestate[voiceId%1024]);
     v.append(0);
-    path.sprintf("/note/%d",notechan[voiceId%1024]);
+    QString path = QString("/note/%1").arg(notechan[voiceId%1024]);
     sendOsc(path,v);
 }
 
@@ -110,9 +108,8 @@ void SenderReaktor::setChannel(int c)
 void SenderReaktor::pc(int v1)
 {
     QVariantList v;
-    QString path;
     v.append(v1);
-    path.sprintf("/pc/%d",_channel);
+    QString path = QString("/pc/%1").arg(_channel);
     sendOsc(path,v);
 }
 
@@ -127,9 +124,8 @@ void SenderReaktor::cc(int, int cc, float, float v1avg)
     if(v1mid!=ccstate[cc]) {
         ccstate[cc]=v1mid;
         QVariantList v;
-        QString path;
         v.append(v1mid);
-        path.sprintf("/cc/%d/%d",_channel,cc);
+        QString path = QString("/cc/%1/%2").arg(_channel,cc);
         sendOsc(path,v);
     }
 }
@@ -143,13 +139,12 @@ void SenderReaktor::sendOsc(QString path, QVariant list)
 void SenderReaktor::sendPitch(int pitch)
 {
     QVariantList v;
-    QString path;
 
     // misuco pitch is in cent (100 per semitone)
     // reaktor pitch is 2048 per semitone
 
     int reaktorRangePitch = pitch * 2048 / 100;
     v.append(reaktorRangePitch);
-    path.sprintf("/pitch/%d",_channel);
+    QString path = QString("/pitch/%1").arg(_channel);
     sendOsc(path,v);
 }

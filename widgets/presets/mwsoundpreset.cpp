@@ -20,6 +20,7 @@
 
 #include "mwsoundpreset.h"
 #include "presetcollection.h"
+#include <QRandomGenerator>
 #include <QDebug>
 
 MWSoundPreset::MWSoundPreset(QList<QObject *> soundFaders, QObject *parent): QObject(parent)
@@ -27,13 +28,13 @@ MWSoundPreset::MWSoundPreset(QList<QObject *> soundFaders, QObject *parent): QOb
     for(auto soundFader:soundFaders) _soundFaders.append(qobject_cast<MWFaderParamCtl*>(soundFader));
     //_soundFaders = soundFaders;
     PresetSound.volume=800;
-    PresetSound.wave_type=qrand() % 4;
-    PresetSound.attack=qrand() % 100;
-    PresetSound.decay=qrand() % 700;
-    PresetSound.sustain=qrand() % 1000;
-    PresetSound.release=qrand() % 1000;
-    PresetSound.filter_cutoff=qrand() % 1000;
-    PresetSound.filter_resonance=qrand() % 100;
+    PresetSound.wave_type=QRandomGenerator::global()->generate() % 4;
+    PresetSound.attack=QRandomGenerator::global()->generate() % 100;
+    PresetSound.decay=QRandomGenerator::global()->generate() % 700;
+    PresetSound.sustain=QRandomGenerator::global()->generate() % 1000;
+    PresetSound.release=QRandomGenerator::global()->generate() % 1000;
+    PresetSound.filter_cutoff=QRandomGenerator::global()->generate() % 1000;
+    PresetSound.filter_resonance=QRandomGenerator::global()->generate() % 100;
     PresetSound.mod_filter_cutoff=50;
     PresetSound.mod_filter_resonance=0;
 }

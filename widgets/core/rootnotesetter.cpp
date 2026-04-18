@@ -91,7 +91,8 @@ void RootNoteSetter::calcText()
     _text1 = _freq->getRootNoteString(_noteSymbols);
 
     if(_showFreqs) {
-        _text2.sprintf("%5.1f",_freq->getFreq());
+        //_text2.sprintf("%5.1f",_freq->getFreq());
+        _text2 = QString("%1").arg(_freq->getFreq(),5,'f',1,u'0');
     } else {
         _text2="";
     }
