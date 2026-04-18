@@ -23,7 +23,7 @@
 
 #include <QString>
 
-#define SCALE_SIZE 11
+const int SCALE_SIZE=11;
 
 enum MWPlayfieldType {
     NORMAL,

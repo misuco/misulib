@@ -1,5 +1,6 @@
 #include <QTimerEvent>
 #include "heartbeat.h"
+#include "lib/misulib/models/types.h"
 
 Heartbeat::Heartbeat(QObject *parent) : QObject(parent),
     _beatNo(1),
