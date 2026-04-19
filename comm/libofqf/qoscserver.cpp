@@ -18,7 +18,6 @@
 
 #include "qoscserver.h"
 
-#include <QRegExp>
 #include <QtNetwork/QUdpSocket>
 
 QOscServer::QOscServer( quint16 port, QObject* p )

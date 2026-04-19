@@ -36,7 +36,7 @@ signals:
     void connected();
 
 public slots:
-    void sendData( QString, QVariant =QVariant::Invalid );
+    void sendData( QString, QVariant );
 
 private slots:
     void tcpStateChanged();
