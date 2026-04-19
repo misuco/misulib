@@ -43,7 +43,7 @@ void Purchases::onTransactionReady(QInAppTransaction *transaction)
 {
     if (transaction->status() == QInAppTransaction::PurchaseApproved
         && transaction->product()->identifier() == QStringLiteral("PresetManager")) {
-        /*
+
         if (!hasAlreadyStoredTransaction(transaction->orderId()) {
             ++m_healthPotions;
             if (!addHealthPotionToPersistentStorage(transaction->orderId())
