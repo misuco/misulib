@@ -26,17 +26,14 @@
 
 QOscBase::QOscBase( QObject* p )
         : QObject( p )
-        , _socket( 0 )
+        , _socket( new QUdpSocket( this ) )
 {
-//    qDebug() << "QOscBase::QOscBase";
-    setSocket( 0 );
 }
 
-QOscBase::QOscBase( QObject* p , bool no_socket)
-        : QObject( p )
-        , _socket( 0 )
+QOscBase::QOscBase()
+    : QObject( nullptr )
+    , _socket( new QUdpSocket( this ) )
 {
-    if(!no_socket)     setSocket( 0 );
 }
 
 void QOscBase::setSocket( QUdpSocket* s ) {
@@ -100,16 +97,16 @@ float QOscBase::toFloat( const QByteArray& b ) {
 }
 
 void QOscBase::oscMessageParseArgs( const QVariant& data, QString& argtypes, QByteArray& arguments ) {
-	if ( data.type() == QVariant::Int ) {
+    if ( data.typeId() == QMetaType::Int ) {
 		argtypes += "i";
 		arguments = arguments + fromInt32( data.toInt() );
-	} else if ( data.type() == QVariant::Double ) {
+    } else if ( data.typeId() == QMetaType::Double ) {
         argtypes += "f";
         arguments += fromFloat( data.toFloat() );
-    } else if ( data.type() == QVariant::String ) {
+    } else if ( data.typeId() == QMetaType::QString ) {
 		argtypes += "s";
 		arguments += fromString( data.toString() );
-	} else if ( data.type() == QVariant::List ) {
+    } else if ( data.typeId() == QMetaType::QVariantList ) {
 		QList<QVariant> list = data.toList();
 		foreach( QVariant v, list )
 			oscMessageParseArgs( v, argtypes, arguments );

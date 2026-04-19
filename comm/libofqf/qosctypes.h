@@ -39,8 +39,7 @@ class QOscBase : public QObject
     Q_OBJECT
 protected:
     QOscBase( QObject* );
-    QOscBase( QObject*, bool );
-    QOscBase() { _socket=0; setSocket( 0 );}
+    QOscBase();
 
     static void fillQByteArrayUp( QByteArray& in );
     static QByteArray reverseQByteArray( QByteArray in );

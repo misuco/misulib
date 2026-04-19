@@ -23,23 +23,25 @@
 #include <QtNetwork/QTcpSocket>
 
 QOscTcpClient::QOscTcpClient(QObject *parent) :
-    QOscBase(parent,true)
+    QOscBase(parent)
 {
+    setSocket(0);
 }
 
 QOscTcpClient::QOscTcpClient( const QHostAddress& address, quint16 port, QObject* p )
-    : QOscBase( p , true)
+    : QOscBase( p )
     , _address( address )
     , _port( port )
     , _tcp_socket (0)
 {
     qDebug() << "QOscClient::QOscClient(" << address << "," << port << "," << p << ")";
+    setSocket(0);
     setupTcpSocket();
     QObject::connect( _tcp_socket, SIGNAL( readyRead() ), this, SLOT( readyRead() ) );
 }
 
 QOscTcpClient::QOscTcpClient( const QHostAddress& address, quint16 source_port, quint16 dst_port, QObject* p )
-    : QOscBase( p , true)
+    : QOscBase( p )
     , _address( address )
     , _source_port( source_port )
     , _port( dst_port )
@@ -48,6 +50,7 @@ QOscTcpClient::QOscTcpClient( const QHostAddress& address, quint16 source_port, 
     /*
      *  Bind to set source port
      */
+    setSocket(0);
     setupTcpSocket();
     QObject::connect( _tcp_socket, SIGNAL( readyRead() ), this, SLOT( readyRead() ) );
 }
