@@ -1,6 +1,7 @@
 import QtQuick 2.0
 
 Item {
+    property var chordLevel: ["ii","II","iii","III","IV","v","V","vi","VI","vii","VII"];
     GridView {
         model: layout.ScaleSwitch
 
@@ -8,7 +9,8 @@ Item {
         cellWidth: buttonSize
         cellHeight: buttonSize
 
-        flow: GridView.FlowTopToBottom
+        flow: GridView.FlowLeftToRight
+        interactive: false
 
         delegate: Rectangle {
             color: modelData.selected ? layout.pitchColors[modelData.rootNote].colorOn
@@ -21,7 +23,7 @@ Item {
 
             Text {
                 anchors.fill: parent
-                text: modelData.text1
+                text: chordLevel[index]
                 font.pixelSize: fontSize1
                 color: modelData.selected ? hlColor : fgColor
                 horizontalAlignment: Text.AlignHCenter
@@ -30,7 +32,7 @@ Item {
 
             Text {
                 anchors.fill: parent
-                text: modelData.text2
+                text: modelData.text1 + modelData.text2
                 font.pixelSize: fontSize3
                 color: modelData.selected ? hlColor : fgColor
                 horizontalAlignment: Text.AlignHCenter

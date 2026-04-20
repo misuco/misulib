@@ -8,8 +8,8 @@ Item {
     onWidthChanged: controller.resize(width,height)
     onHeightChanged: controller.resize(width,height)
 
-    property int playFieldWidth: root.width/controller.cols
-    property int playFieldHeight: root.height/controller.rows
+    property double playFieldWidth: root.width/controller.cols
+    property double playFieldHeight: root.height/controller.rows
 
     property int fontSizeL: playFieldWidth>playFieldHeight ? playFieldHeight/2 :  playFieldWidth/2
     property int fontSizeM: playFieldWidth>playFieldHeight ? playFieldHeight/4 :  playFieldWidth/4

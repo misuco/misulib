@@ -38,6 +38,10 @@ OctaveRanger::~OctaveRanger()
 void OctaveRanger::onUpdated(int id, int x)
 {
     int touchOct=x/segwidth;
+
+    // ignore out if range touches
+    if(x<0 || touchOct>=noct) { return; }
+
     if(touchOct==bottom) {
         grabedBot=true;
         grabedBotTouchId=id;
