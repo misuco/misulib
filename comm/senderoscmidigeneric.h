@@ -21,7 +21,7 @@
 #define SENDEROSCMIDIGENERIC_H
 
 #include <QObject>
-#include "lib/misulib/comm/libofqf/qoscclientinterface.h"
+#include "misulib/comm/libofqf/qoscclientinterface.h"
 
 class SenderOscMidiGeneric : public QObject
 {

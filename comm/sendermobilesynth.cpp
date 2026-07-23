@@ -23,14 +23,20 @@
 
 SenderMobileSynth::SenderMobileSynth(QObject * parent) : QObject(parent)
 {
-    sy= new MobileSynth();
+    sy = std::make_shared<MobileSynth>();
     qDebug() << "+++++++++++++++++++++++";
     qDebug() << "mobileSynthQt68 created";
 }
 
+SenderMobileSynth::SenderMobileSynth(std::shared_ptr<MobileSynth> mobileSynth, QObject *parent)
+{
+    sy = mobileSynth;
+    qDebug() << "+++++++++++++++++++++++";
+    qDebug() << "mobileSynthQt68 injected";
+}
+
 SenderMobileSynth::~SenderMobileSynth()
 {
-    delete(sy);
 }
 
 void SenderMobileSynth::cc(int voiceId, int cc, float v1, float)

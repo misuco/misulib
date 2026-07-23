@@ -21,7 +21,7 @@
 #define SENDERREAKTOR_H
 
 #include <QObject>
-#include "lib/misulib/comm/libofqf/qoscclientinterface.h"
+#include "misulib/comm/libofqf/qoscclientinterface.h"
 
 class SenderReaktor : public QObject
 {

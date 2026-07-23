@@ -30,10 +30,11 @@ class SenderMobileSynth : public QObject
 
 public:
     explicit SenderMobileSynth(QObject * parent = nullptr);
+    explicit SenderMobileSynth(std::shared_ptr<MobileSynth> mobileSynth, QObject * parent = nullptr);
     ~SenderMobileSynth();
 
 public:
-    MobileSynth * getSynthController() {
+    std::shared_ptr<MobileSynth> getSynthController() {
         return sy;
     }
 
@@ -45,7 +46,7 @@ public slots:
     void pitch(int voiceId, float f, int, int);
     
 private:
-    MobileSynth * sy;
+    std::shared_ptr<MobileSynth> sy;
 };
 
 #endif // SENDERMOBILESYNTH_H

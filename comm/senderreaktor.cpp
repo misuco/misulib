@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 #include "senderreaktor.h"
-#include "lib/misulib/comm/libofqf/qoscclient.h"
+#include "misulib/comm/libofqf/qoscclient.h"
 
 SenderReaktor::SenderReaktor(QObject *parent) : QObject(parent)
 {

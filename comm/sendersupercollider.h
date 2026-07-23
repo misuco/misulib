@@ -21,7 +21,7 @@
 #define SENDERSUPERCOLLIDER_H
 
 #include <QObject>
-#include "lib/misulib/comm/libofqf/qoscclientinterface.h"
+#include "misulib/comm/libofqf/qoscclientinterface.h"
 
 class SenderSuperCollider : public QObject
 {
