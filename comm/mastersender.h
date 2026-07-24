@@ -31,11 +31,12 @@ class MasterSender : public QObject
 public:
     explicit MasterSender(QObject * parent = nullptr);
     ~MasterSender();
-    void cc(int nextVoiceId, int cc, float v1, float v1avg);
-    void pc(int v1);
-    int noteOn(float f, int midinote, int pitch, int v);
-    void noteOff(int voiceId);
-    void pitch(int voiceId, float f, int midinote, int pitch);
+    Q_INVOKABLE void cc(int nextVoiceId, int cc, float v1, float v1avg);
+    Q_INVOKABLE void pc(int v1);
+    Q_INVOKABLE int noteOn(float f, int midinote, int pitch, int v);
+    Q_INVOKABLE void noteOff(int voiceId);
+    Q_INVOKABLE void pitch(int voiceId, float f, int midinote, int pitch);
+
     void addSenderThread(QObject *s, QString name);
 
 public slots:
