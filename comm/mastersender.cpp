@@ -21,12 +21,6 @@
 #include "senderthread.h"
 #include <QDebug>
 
-MasterSender::MasterSender(QObject *parent) : QObject(parent)
-{
-    nextVoiceId=1;
-
-}
-
 MasterSender::~MasterSender()
 {
 }

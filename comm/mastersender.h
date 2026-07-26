@@ -20,6 +20,8 @@
 #ifndef SENDERMULTI_H
 #define SENDERMULTI_H
 
+#include <QtQmlIntegration/qqmlintegration.h>
+
 #include <QObject>
 #include <QList>
 #include <QMap>
@@ -27,10 +29,13 @@
 class MasterSender : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Cannot instantiate MasterSender")
 
 public:
-    explicit MasterSender(QObject * parent = nullptr);
+    explicit MasterSender() = default;
     ~MasterSender();
+
     Q_INVOKABLE void cc(int nextVoiceId, int cc, float v1, float v1avg);
     Q_INVOKABLE void pc(int v1);
     Q_INVOKABLE int noteOn(float f, int midinote, int pitch, int v);
