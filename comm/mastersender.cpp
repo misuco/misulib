@@ -41,7 +41,7 @@ int MasterSender::noteOn(float f, int midinote, int pitch, int v)
     qDebug() << "MasterSender::noteOn f: " << f << ", midinote: " << midinote << ", pitch: " << pitch << ", v: " << v << ")";
     int vid=nextVoiceId;
     nextVoiceId++;
-    if(nextVoiceId>1023)  nextVoiceId=1;
+    if(nextVoiceId>87)  nextVoiceId=1;
     emit sigNoteOn(vid,f,midinote,pitch,v);
     return vid;
 }

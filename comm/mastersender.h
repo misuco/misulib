@@ -56,7 +56,8 @@ signals:
 
 private:
     QMap<QString,QObject *> mSenders;
-    int nextVoiceId;
+    int nextVoiceId{1};
+
     void connectSender(QObject *s);
     void disconnectSender(QObject *s);
 };
