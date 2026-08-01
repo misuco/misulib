@@ -25,25 +25,31 @@ MasterSender::~MasterSender()
 {
 }
 
-void MasterSender::cc(int voiceId, int cc, float v1, float v1avg)
+void MasterSender::cc(int voiceId, int cc, float value)
 {
-    qDebug() << "MasterSender::cc( voiceId: " << voiceId << ", cc: " << cc << ", v1: " << v1 << ", v1avg: " << v1avg << ")";
-    emit sigCc(voiceId,cc,v1,v1avg);
+    qDebug() << "MasterSender::cc( voiceId: " << voiceId << ", cc: " << cc << ", value: " << value << ")";
+    emit sigCc(voiceId,cc,value);
 }
 
-void MasterSender::pc(int v1)
+void MasterSender::ccAllVoices(int cc, float value)
 {
-    emit sigPc(v1);
+    qDebug() << "MasterSender::ccAllVoices( cc: " << cc << ", value: " << value << ")";
+    emit sigCcAllVoices(cc,value);
+}
+
+void MasterSender::pc(int value)
+{
+    emit sigPc(value);
 }
 
 int MasterSender::noteOn(float f, int midinote, int pitch, int v)
 {
     qDebug() << "MasterSender::noteOn f: " << f << ", midinote: " << midinote << ", pitch: " << pitch << ", v: " << v << ")";
-    int vid=nextVoiceId;
+    int voiceId=nextVoiceId;
     nextVoiceId++;
     if(nextVoiceId>87)  nextVoiceId=1;
-    emit sigNoteOn(vid,f,midinote,pitch,v);
-    return vid;
+    emit sigNoteOn(voiceId,f,midinote,pitch,v);
+    return voiceId;
 }
 
 void MasterSender::noteOff(int voiceId)
@@ -73,18 +79,15 @@ void MasterSender::connectSender(QObject * s) {
     connect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
     connect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
     connect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
-    connect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
+    connect(this,SIGNAL(sigCc(int,int,float)),s,SLOT(cc(int,int,float)));
+    connect(this,SIGNAL(sigCcAllVoices(int,float)),s,SLOT(ccAllVoices(int,float)));
     connect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
 }
 
 void MasterSender::disconnectSender(QObject *s)
 {
     qDebug() << "MasterSender::disconnectSender " << s;
-    disconnect(this,SIGNAL(sigNoteOn(int,float,int,int,int)),s,SLOT(noteOn(int,float,int,int,int)));
-    disconnect(this,SIGNAL(sigNoteOff(int)),s,SLOT(noteOff(int)));
-    disconnect(this,SIGNAL(sigPitch(int,float,int,int)),s,SLOT(pitch(int,float,int,int)));
-    disconnect(this,SIGNAL(sigCc(int,int,float,float)),s,SLOT(cc(int,int,float,float)));
-    disconnect(this,SIGNAL(sigPc(int)),s,SLOT(pc(int)));
+    this->disconnect(s);
 }
 
 void MasterSender::onToggleSender(QString id, bool value)

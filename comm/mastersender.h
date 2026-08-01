@@ -36,9 +36,10 @@ public:
     explicit MasterSender() = default;
     ~MasterSender();
 
-    Q_INVOKABLE void cc(int nextVoiceId, int cc, float v1, float v1avg);
-    Q_INVOKABLE void pc(int v1);
-    Q_INVOKABLE int noteOn(float f, int midinote, int pitch, int v);
+    Q_INVOKABLE void cc(int voiceId, int cc, float value);
+    Q_INVOKABLE void ccAllVoices(int cc, float value);
+    Q_INVOKABLE void pc(int value);
+    Q_INVOKABLE int noteOn(float f, int midinote, int pitch, int velocity);
     Q_INVOKABLE void noteOff(int voiceId);
     Q_INVOKABLE void pitch(int voiceId, float f, int midinote, int pitch);
 
@@ -48,9 +49,10 @@ public slots:
     void onToggleSender(QString id, bool value);
 
 signals:
-    void sigCc(int nextVoiceId, int cc, float v1, float v1avg);
-    void sigPc(int v1);
-    int sigNoteOn(int vid, float f, int midinote, int pitch, int v);
+    void sigCc(int voiceId, int cc, float value);
+    void sigCcAllVoices(int cc, float value);
+    void sigPc(int value);
+    int sigNoteOn(int voiceId, float f, int midinote, int pitch, int velocity);
     void sigNoteOff(int voiceId);
     void sigPitch(int voiceId, float f, int midinote, int pitch);
 

@@ -107,12 +107,16 @@ void SenderOscMidiGeneric::pc(int v1)
     sendOsc(path,v);
 }
 
-void SenderOscMidiGeneric::cc(int, int cc, float, float v1avg)
+void SenderOscMidiGeneric::cc(int voiceId, int cc, float value) {
+
+}
+
+void SenderOscMidiGeneric::ccAllVoices(int cc, float value)
 {
     //qDebug() <<  "SenderOscPuredata::cc " << cc << " v1 " << v1;
 
     // translate value to midi
-    int v1mid=(float)127*v1avg;
+    int v1mid=(float)127*value;
 
     // translate cc numbers
     if(v1mid!=ccstate[cc]) {

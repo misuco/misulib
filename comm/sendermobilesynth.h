@@ -39,7 +39,8 @@ public:
     }
 
 public slots:
-    void cc(int voiceId, int cc, float v1, float);
+    void cc(int voiceId, int cc, float value);
+    void ccAllVoices(int cc, float value);
     void pc(int);
     void noteOn(int voiceId, float f, int midinote, int pitch, int v);
     void noteOff(int voiceId);
@@ -47,6 +48,7 @@ public slots:
     
 private:
     std::shared_ptr<MobileSynth> sy;
+    void ccToSynth(int voiceId, int cc, float value, bool allVoices);
 };
 
 #endif // SENDERMOBILESYNTH_H

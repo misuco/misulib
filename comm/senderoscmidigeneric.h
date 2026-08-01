@@ -39,7 +39,8 @@ public:
     void setChannel(int c);
 
 public slots:
-    void cc(int voiceId, int cc, float v1, float v1avg);
+    void cc(int voiceId, int cc, float value);
+    void ccAllVoices(int cc, float value);
     void pc(int v1);
     void noteOn(int voiceId, float f, int midinote, int pitch, int v);
     void noteOff(int voiceId);
