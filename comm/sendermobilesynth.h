@@ -23,15 +23,49 @@
 #include <QObject>
 #include <QtGlobal>
 #include "polymobilesynth/qt6/mobilesynth.h"
+#include <QtQmlIntegration/qqmlintegration.h>
 
 class SenderMobileSynth : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Cannot instantiate SenderMobileSynth")
 
 public:
     explicit SenderMobileSynth(QObject * parent = nullptr);
     explicit SenderMobileSynth(std::shared_ptr<MobileSynth> mobileSynth, QObject * parent = nullptr);
     ~SenderMobileSynth();
+
+    enum CcNum {
+        CCModAmount = 1,
+        CCArpeggioEnabled = 20,
+        CCArpeggioSamples = 21,
+        CCArpeggioOctaves = 22,
+        CCArpeggioStep = 23,
+        CCOsc1Level = 24,
+        CCOsc1WaveType = 25,
+        CCOsc1Octave = 26,
+        CCOsc2Level = 27,
+        CCOsc2WaveType = 28,
+        CCOsc2Octave = 29,
+        CCOsc2Shift = 30,
+        CCOscSync = 31,
+        CCFilterResonance = 71,
+        CCFilterCutoff = 74,
+        CCModSource = 85,
+        CCModDest = 86,
+        CCModFreq = 87,
+        CCAmpEnvAttack = 102,
+        CCAmpEnvDecay = 103,
+        CCAmpEnvSustain = 104,
+        CCAmpEnvRelease = 105,
+        CCFilEnvAttack = 106,
+        CCFilEnvDecay = 107,
+        CCFilEnvSustain = 108,
+        CCFilEnvRelease = 109,
+        CCGlideSamples = 110
+    };
+    Q_ENUM(CcNum)
 
 public:
     std::shared_ptr<MobileSynth> getSynthController() {

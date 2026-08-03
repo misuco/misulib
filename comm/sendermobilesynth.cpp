@@ -65,13 +65,13 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
     const long release_min = 10;
     const long release_max = 400000;
 
-    if(cc==20) {
+    if(cc==CCArpeggioEnabled) {
 
         bool v = value>0;
 
         sy->set_arpeggio_enabled( v );
 
-    } else if(cc==21) {
+    } else if(cc==CCArpeggioSamples) {
 
         const int arp_min_size = 10;
         const int arp_max_increase = 1000;
@@ -79,7 +79,7 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_arpeggio_samples( v );
 
-    } else if(cc==22) {
+    } else if(cc==CCArpeggioOctaves) {
 
         const int arp_min_octaves = 1;
         const int arp_max_octaves = 4;
@@ -87,7 +87,7 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_arpeggio_octaves( v );
 
-    } else if(cc==23) {
+    } else if(cc==CCArpeggioStep) {
 
         const int arp_min_step = 0;
         const int arp_max_step = 3;
@@ -95,14 +95,14 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_arpeggio_step( v );
 
-    } else if(cc==24) {
+    } else if(cc==CCGlideSamples) {
 
         const int glide_smp_max = 400000;
         int v = static_cast<int>( glide_smp_max * std::clamp(value, 0.0f, 1.0f) );
 
         sy->set_glide_samples( v );
 
-    } else if(cc==74) {
+    } else if(cc==CCFilterCutoff) {
 
         const float filter_min_cutoff = 10.0f;
         const float filter_max_cutoff_increase = 16000.0f;
@@ -110,63 +110,63 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_filter_cutoff( v );
 
-    } else if(cc==71) {
+    } else if(cc==CCFilterResonance) {
 
         const float filter_max_reso = 5.0f;
         float v = static_cast<float>( filter_max_reso * std::clamp(value, 0.0f, 1.0f) );
 
         sy->set_filter_resonance( v );
 
-    } else if(cc==24) {
+    } else if(cc==CCOsc1Level) {
 
         float v = std::clamp(value, 0.0f, 1.0f);
 
         sy->set_osc1_level( v );
 
-    } else if(cc==25) {
+    } else if(cc==CCOsc1WaveType) {
 
         int v = std::clamp(static_cast<int>(value), osc_min_wave_type, osc_max_wave_type);
 
         sy->set_osc1_wave_type( v );
 
-    } else if(cc==26) {
+    } else if(cc==CCOsc1Octave) {
 
         int v = std::clamp(static_cast<int>(value), osc_min_octave, osc_max_octave);
 
         sy->set_osc1_octave( v );
 
-    } else if(cc==27) {
+    } else if(cc==CCOsc2Level) {
 
         float v = std::clamp(value, 0.0f, 1.0f);
 
         sy->set_osc2_level( v );
 
-    } else if(cc==28) {
+    } else if(cc==CCOsc2WaveType) {
 
         int v = std::clamp(static_cast<int>(value), osc_min_wave_type, osc_max_wave_type);
 
         sy->set_osc2_wave_type( v );
 
-    } else if(cc==29) {
+    } else if(cc==CCOsc2Octave) {
 
         int v = std::clamp(static_cast<int>(value), osc_min_octave, osc_max_octave);
 
         sy->set_osc2_octave( v );
 
-    } else if(cc==30) {
+    } else if(cc==CCOsc2Shift) {
 
         const float osc2_max_shift = 1200;
         int v = static_cast<int>( osc2_max_shift * std::clamp(value, 0.0f, 1.0f) );
 
         sy->set_osc2_shift( v );
 
-    } else if(cc==31) {
+    } else if(cc==CCOscSync) {
 
             bool v = value>0;
 
             sy->set_osc_sync( v );
 
-    } else if(cc==85) {
+    } else if(cc==CCModSource) {
 
         const int mod_min_source = 0;
         const int mod_max_source = 3;
@@ -174,7 +174,7 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_modulation_source( v );
 
-    } else if(cc==86) {
+    } else if(cc==CCModDest) {
 
         const int mod_min_dest = 0;
         const int mod_max_dest = 3;
@@ -182,7 +182,7 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_modulation_destination( v );
 
-    } else if(cc==1) {
+    } else if(cc==CCModAmount) {
 
         float v = std::clamp(value, 0.0f, 1.0f);
 
@@ -193,7 +193,7 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
             sy->set_modulation_amount( voiceId, v );
         }
 
-    } else if(cc==87) {
+    } else if(cc==CCModFreq) {
 
         const float mod_f_min = 0.1f;
         const float mod_f_max_inc = 200.0f;
@@ -201,49 +201,49 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
         sy->set_modulation_frequency(v);
 
-    } else if(cc==102) {
+    } else if(cc==CCAmpEnvAttack) {
 
         float v = attack_min + attack_max * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_volume_attack(v);
 
-    } else if(cc==103) {
+    } else if(cc==CCAmpEnvDecay) {
 
         float v = decay_min + decay_max * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_volume_decay(v);
 
-    } else if(cc==104) {
+    } else if(cc==CCAmpEnvSustain) {
 
         float v = std::clamp(value, 0.0f, 1.0f);
 
         sy->set_volume_sustain(v);
 
-    } else if(cc==105) {
+    } else if(cc==CCAmpEnvRelease) {
 
         float v = release_min + release_max * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_volume_release(v);
 
-    } else if(cc==106) {
+    } else if(cc==CCFilEnvAttack) {
 
         float v = attack_min + attack_max * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_filter_attack(v);
 
-    } else if(cc==107) {
+    } else if(cc==CCFilEnvDecay) {
 
         float v = decay_min + decay_max * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_filter_decay(v);
 
-    } else if(cc==108) {
+    } else if(cc==CCFilEnvSustain) {
 
         float v = std::clamp(value, 0.0f, 1.0f);
 
         sy->set_filter_sustain(v);
 
-    } else if(cc==109) {
+    } else if(cc==CCFilEnvRelease) {
 
         float v = release_min + release_max * std::clamp(value, 0.0f, 1.0f);
 
