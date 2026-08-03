@@ -112,9 +112,8 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
     } else if(cc==71) {
 
-        const float filter_max_reso = 0.5;
-
-        int v = static_cast<int>( filter_max_reso * std::clamp(value, 0.0f, 1.0f) );
+        const float filter_max_reso = 5.0f;
+        float v = static_cast<float>( filter_max_reso * std::clamp(value, 0.0f, 1.0f) );
 
         sy->set_filter_resonance( v );
 
