@@ -104,15 +104,15 @@ void SenderMobileSynth::ccToSynth(int voiceId, int cc, float value, bool allVoic
 
     } else if(cc==CCFilterCutoff) {
 
-        const float filter_min_cutoff = 10.0f;
-        const float filter_max_cutoff_increase = 16000.0f;
+        const float filter_min_cutoff = 1.0f;
+        const float filter_max_cutoff_increase = 1000.0f;
         float v = filter_min_cutoff + filter_max_cutoff_increase * std::clamp(value, 0.0f, 1.0f);
 
         sy->set_filter_cutoff( v );
 
     } else if(cc==CCFilterResonance) {
 
-        const float filter_max_reso = 5.0f;
+        const float filter_max_reso = 10.0f;
         float v = static_cast<float>( filter_max_reso * std::clamp(value, 0.0f, 1.0f) );
 
         sy->set_filter_resonance( v );
