@@ -2,7 +2,7 @@
 #define HEARTBEAT_H
 
 #include <QObject>
-#include "misulib/comm/libofqf/qoscclient.h"
+#include "qoscclient.h"
 
 class Heartbeat : public QObject
 {
